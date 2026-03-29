@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather MCP Agent — Under the Hood</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1a1a1a;
+    color: #c8c6be;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 32px 24px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #f0ede6;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    color: #888780;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  .stack-list {
+    list-style: none;
+    margin: 12px 0 32px 0;
+  }
+  .stack-list li {
+    font-size: 13px;
+    color: #a0a09a;
+    padding: 2px 0;
+  }
+  .stack-list li code {
+    background: #2a2a2a;
+    color: #9FE1CB;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 12px;
+  }
+  hr { border: none; border-top: 1px solid #2e2e2e; margin: 28px 0; }
+
+  /* Phase card */
+  .phase-card {
+    background: #222222;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+  }
+  .phase-bar {
+    display: inline-block;
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .badge {
+    display: inline-block;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* Phase colors */
+  .phase-startup  { background: #0C447C; color: #B5D4F4; }
+  .badge-startup  { background: #185FA5; color: #E6F1FB; }
+  .phase-disc     { background: #085041; color: #9FE1CB; }
+  .badge-disc     { background: #0F6E56; color: #E1F5EE; }
+  .phase-llm      { background: #3C3489; color: #CECBF6; }
+  .badge-llm      { background: #534AB7; color: #EEEDFE; }
+  .phase-tool     { background: #633806; color: #FAC775; }
+  .badge-tool     { background: #854F0B; color: #FAEEDA; }
+  .phase-loop     { background: #2C2C2A; color: #D3D1C7; }
+  .phase-memory   { background: #27500A; color: #C0DD97; }
+  .phase-summary  { background: #2C2C2A; color: #B4B2A9; }
+
+  /* Log from section */
+  .log-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    color: #534AB7;
+    margin-bottom: 8px;
+  }
+
+  /* Code block */
+  pre {
+    background: #181818;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.9;
+    color: #c8c6be;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 10px 0;
+  }
+  code {
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 12px;
+  }
+
+  /* Inline color classes */
+  .hl-p  { color: #9F9BE8; font-weight: 600; }   /* purple - components */
+  .hl-t  { color: #5DCAA5; font-weight: 600; }   /* teal   - tools/results */
+  .hl-a  { color: #EF9F27; font-weight: 600; }   /* amber  - user input */
+  .hl-b  { color: #85B7EB; font-weight: 600; }   /* blue   - LLM */
+  .hl-r  { color: #F09595; font-weight: 600; }   /* red    - errors/warnings */
+  .hl-g  { color: #666460; }                      /* gray   - comments */
+  .hl-gr { color: #97C459; font-weight: 600; }   /* green  - success */
+
+  /* What this means block */
+  .meaning {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #1e1e1e;
+    border-left: 3px solid #534AB7;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px;
+    color: #c8c6be;
+    line-height: 1.7;
+  }
+  .meaning-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    color: #534AB7;
+    margin-bottom: 6px;
+  }
+  .meaning p { margin-bottom: 6px; }
+  .meaning p:last-child { margin-bottom: 0; }
+
+  /* Key insight callout */
+  .insight {
+    background: #1a1a2e;
+    border: 1px solid #3C3489;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #CECBF6;
+    margin: 10px 0;
+    line-height: 1.6;
+  }
+  .insight strong { color: #9F9BE8; }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin-top: 10px;
+  }
+  th {
+    background: #2a2a2a;
+    color: #888780;
+    font-weight: 600;
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #333;
+    font-size: 11px;
+    letter-spacing: .04em;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #262626;
+    color: #c8c6be;
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  td:first-child { color: #9F9BE8; font-family: monospace; font-weight: 600; }
+
+  /* Two-column layout for memory section */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+  .col-box {
+    background: #181818;
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid #2e2e2e;
+  }
+  .col-title { font-size: 11px; font-weight: 600; margin-bottom: 8px; }
+  .col-title.bad  { color: #F09595; }
+  .col-title.good { color: #5DCAA5; }
+
+  /* TOC */
+  .toc { background: #1e1e1e; border-radius: 10px; padding: 16px 20px; margin-bottom: 28px; border: 1px solid #2e2e2e; }
+  .toc-title { font-size: 11px; font-weight: 700; letter-spacing: .06em; color: #666460; margin-bottom: 10px; }
+  .toc a { color: #85B7EB; text-decoration: none; font-size: 13px; display: block; padding: 2px 0; }
+  .toc a:hover { color: #B5D4F4; }
+
+  h2 { font-size: 15px; font-weight: 600; color: #f0ede6; margin: 24px 0 12px; }
+</style>
+</head>
+<body>
+
+<h1>Weather MCP Agent — Under the Hood</h1>
+<p class="subtitle">A phase-by-phase walkthrough of every log line — mapped to the component that produced it.</p>
+
+<ul class="stack-list">
+  <li>LLM: <code>qwen3.5:9b</code> via Ollama (local)</li>
+  <li>LLM bridge: <code>langchain-ollama</code> → ChatOllama</li>
+  <li>Orchestrator: <code>LangGraph</code> inside <code>mcp-use</code> MCPAgent</li>
+  <li>MCP bridge: <code>mcp-use</code> MCPClient</li>
+  <li>MCP server: <code>server.py</code> exposing <code>get_weather</code> and <code>get_forecast</code></li>
+</ul>
+
+<hr>
+
+<div class="toc">
+  <div class="toc-title">CONTENTS</div>
+  <a href="#phase0">Phase 0 — App Startup</a>
+  <a href="#phase1">Phase 1 — Tool Discovery</a>
+  <a href="#phase2">Phase 2 — LLM Call #1</a>
+  <a href="#phase3">Phase 3 — Tool Execution</a>
+  <a href="#phase4">Phase 4 — LLM Call #2</a>
+  <a href="#loop">The Full Loop</a>
+  <a href="#memory">memory_enabled=True</a>
+  <a href="#summary">Component Summary</a>
+</div>
+
+<!-- ===== PHASE 0 ===== -->
+<div class="phase-card" id="phase0">
+  <div class="phase-bar phase-startup">PHASE 0 — App startup: MCPClient connects to your weather MCP server <span class="badge badge-startup">startup</span></div>
+  <div class="log-label">FROM YOUR LOG:</div>
+<pre>🔌 Found 0 existing sessions
+🔄 No active sessions found, creating new ones...
+Connecting to MCP implementation: uv
+Starting StdioConnectionManager task    <span class="hl-g">← launches: uv run src/server.py as a subprocess</span>
+StdioConnectionManager connected successfully</pre>
+
+  <div class="meaning">
+    <div class="meaning-label">WHAT THIS MEANS:</div>
+    <p><code>MCPClient</code> reads your config and <strong>launches <code>server.py</code> as a local subprocess</strong> using <code>uv run src/server.py</code>.</p>
+    <p>Communication happens over <strong>stdio</strong> (standard input/output) — not HTTP. This is the "stdio transport" mode in MCP.</p>
+    <p>This happens <strong>before you type anything.</strong></p>
+  </div>
+
+<pre>Config that caused this:
+  "weather": {
+    "command": "uv",
+    "args": <span class="hl-t">["run", "src/server.py"]</span>   <span class="hl-g">← spawns this as subprocess</span>
+  }</pre>
+</div>
+
+<!-- ===== PHASE 1 ===== -->
+<div class="phase-card" id="phase1">
+  <div class="phase-bar phase-disc">PHASE 1 — mcp-use discovers tools from your server <span class="badge badge-disc">tool discovery</span></div>
+  <div class="log-label">FROM YOUR LOG:</div>
+<pre>→ stdio:uv run src/server.py -> initialize        <span class="hl-g">(4.190s) ← MCP handshake: "hello, I'm a client"</span>
+→ stdio:uv run src/server.py -> tools/list        <span class="hl-g">(0.008s) ← "what tools do you have?"</span>
+← stdio:uv run src/server.py <- tools/list        <span class="hl-t">["get_weather", "get_forecast"]</span>
+→ stdio:uv run src/server.py -> resources/list    <span class="hl-g">(0.003s) ← "any resources?" → none</span>
+→ stdio:uv run src/server.py -> prompts/list      <span class="hl-g">(0.003s) ← "any prompts?" → none</span>
+
+MCP session initialized with 2 tools, 0 resources, 0 prompts
+✅ Created 1 new sessions
+🛠️  Created 2 LangChain tools from client   <span class="hl-t">← mcp-use auto-wraps for LangChain</span>
+🧠  Agent ready with tools: <span class="hl-t">get_weather, get_forecast</span></pre>
+
+  <div class="meaning">
+    <div class="meaning-label">WHAT THIS MEANS:</div>
+    <p><code>mcp-use</code> sent 3 MCP protocol messages to your <code>server.py</code> subprocess.</p>
+    <p>Server responded with 2 tools. <code>mcp-use</code> <strong>auto-converted them into LangChain StructuredTools</strong> — this is its core job. Without it you'd manually write a LangChain wrapper for every single tool on every server.</p>
+    <p>This all happens <strong>before you type anything.</strong></p>
+  </div>
+</div>
+
+<!-- ===== PHASE 2 ===== -->
+<div class="phase-card" id="phase2">
+  <div class="phase-bar phase-llm">PHASE 2 — LLM Call #1: qwen3.5:9b reads context and decides which tool to call <span class="badge badge-llm">LLM call 1</span></div>
+  <div class="log-label">FROM YOUR LOG — exact prompt sent to qwen3.5:9b:</div>
+<pre>System: You are a helpful AI assistant.
+        You have access to the following tools:
+        <span class="hl-t">- get_weather: Get the weather for a given city.</span>
+        <span class="hl-t">- get_forecast: Get the forecast for a given city.</span>
+        Use these tools to help answer questions and complete tasks as needed.
+Human:  <span class="hl-a">What is the weather in Tokyo?</span></pre>
+
+  <div class="meaning">
+    <div class="meaning-label">WHAT THIS MEANS:</div>
+    <p><code>langchain-ollama</code> sends this prompt to <code>localhost:11434</code> (your Ollama instance). The prompt contains two things:</p>
+    <p><strong>1.</strong> System message — who the LLM is + <strong>tool list injected by mcp-use</strong></p>
+    <p><strong>2.</strong> Human message — your actual question</p>
+    <p>The LLM reads both and does <strong>pure text matching</strong>: "weather in Tokyo" → matches "get_weather: Get the weather for a given city" → decides to call it.</p>
+  </div>
+
+  <div class="log-label" style="margin-top:14px">LLM OUTPUT (334 seconds — cold start, model loading):</div>
+<pre>tool_calls: [{
+  "name": <span class="hl-t">"get_weather"</span>,
+  "args": { "city": <span class="hl-a">"Tokyo"</span> },
+  "type": "tool_call"
+}]
+content: <span class="hl-g">""   ← empty. LLM returned only a tool call — no text answer yet.</span>
+
+input_tokens: 393   output_tokens: 73   total_tokens: 466</pre>
+
+  <div class="insight">
+    <strong>Key insight:</strong> The LLM returned <strong>no text</strong> — only a JSON tool call. Its entire job in round 1 was to decide <em>what to call</em>. LangGraph sees <code>tool_calls</code> is not empty → does <strong>not</strong> stop the loop → routes to the <code>tools</code> node.
+  </div>
+</div>
+
+<!-- ===== PHASE 3 ===== -->
+<div class="phase-card" id="phase3">
+  <div class="phase-bar phase-tool">PHASE 3 — mcp-use executes get_weather via call_tool on your server.py <span class="badge badge-tool">tool execution</span></div>
+  <div class="log-label">FROM YOUR LOG:</div>
+<pre>MCP tool <span class="hl-t">"get_weather"</span> received input: {'city': 'Tokyo'}
+Calling tool 'get_weather' with arguments: {'city': 'Tokyo'}
+→ stdio:uv run src/server.py -> tools/call         <span class="hl-g">← sent to your server.py subprocess</span>
+← stdio:uv run src/server.py <- tools/call (2.394s) <span class="hl-g">← server.py responded</span>
+
+Tool result:
+  <span class="hl-t">"The weather in Tokyo is Patchy rain nearby with a temperature of
+   17°C, humidity of 77%, wind speed of 22 km/h from the SW direction."</span></pre>
+
+  <div class="meaning">
+    <div class="meaning-label">WHAT THIS MEANS:</div>
+    <p>LangGraph's <code>tools</code> node hands the tool call to <code>mcp-use</code>, which:</p>
+    <p><strong>1.</strong> Sends a <code>tools/call</code> message to <code>server.py</code> via stdio</p>
+    <p><strong>2.</strong> <code>server.py</code> calls the real weather API</p>
+    <p><strong>3.</strong> Returns the result as a <code>ToolMessage</code></p>
+    <p>LangGraph <strong>appends the ToolMessage to the context</strong> and loops back to the LLM for another round.</p>
+  </div>
+</div>
+
+<!-- ===== PHASE 4 ===== -->
+<div class="phase-card" id="phase4">
+  <div class="phase-bar phase-llm">PHASE 4 — LLM Call #2: full growing context — LLM writes final answer <span class="badge badge-llm">LLM call 2</span></div>
+  <div class="log-label">FROM YOUR LOG — exact prompt sent on the SECOND call (context is now bigger):</div>
+<pre>System:  You are a helpful AI assistant. Tools: get_weather, get_forecast...
+Human:   <span class="hl-a">What is the weather in Tokyo?</span>
+AI:      <span class="hl-p">[tool_call: get_weather(city=Tokyo)]</span>    <span class="hl-g">← LLM's own previous decision, replayed</span>
+Tool:    <span class="hl-t">"The weather in Tokyo is Patchy rain nearby, 17°C, humidity 77%..."</span>  <span class="hl-g">← injected result</span></pre>
+
+  <div class="meaning">
+    <div class="meaning-label">WHAT THIS MEANS:</div>
+    <p>The LLM now has <strong>everything</strong> — the original question, what it decided to call, and the actual result. It reads all of this and writes the final text answer.</p>
+    <p>Token count grew: <strong>393 → 474</strong> (+81 tokens from the injected tool result).</p>
+  </div>
+
+  <div class="log-label" style="margin-top:14px">LLM OUTPUT (289 seconds — model warm, faster):</div>
+<pre>content: <span class="hl-t">"The weather in Tokyo is currently showing patchy rain nearby.
+          Here are the current conditions:
+          - Temperature: 17°C
+          - Humidity: 77%
+          - Wind speed: 22 km/h from the SW direction
+          Would you like me to get a forecast for Tokyo as well?"</span>
+
+tool_calls: <span class="hl-gr">[]</span>   <span class="hl-g">← EMPTY. No more tool calls. LLM decided it's done.</span>
+
+input_tokens: 474   output_tokens: 96   total_tokens: 570</pre>
+
+  <div class="insight">
+    <strong>LangGraph sees <code>tool_calls=[]</code> → exits the loop → returns the final answer.</strong>
+  </div>
+</div>
+
+<!-- ===== THE LOOP ===== -->
+<div class="phase-card" id="loop">
+  <div class="phase-bar phase-loop">THE FULL LOOP — what LangGraph actually ran for your query</div>
+<pre>LangGraph chain start
+│
+├─ <span class="hl-p">ModelCallLimitMiddleware.before_model</span>   <span class="hl-g">← checks: under 15 step limit? yes.</span>
+│
+├─ <span class="hl-b">model [LLM Call #1]</span>                    <span class="hl-g">← qwen3.5:9b thinks (334s cold start)</span>
+│   output: tool_calls=[<span class="hl-t">get_weather(city=Tokyo)</span>]
+│
+├─ <span class="hl-p">ModelCallLimitMiddleware.after_model</span>    <span class="hl-g">← records call_count=1</span>
+│
+├─ <span class="hl-t">tools node</span>                              <span class="hl-g">← mcp-use fires tools/call at server.py (2.4s)</span>
+│   output: ToolMessage with weather result
+│
+├─ <span class="hl-p">ModelCallLimitMiddleware.before_model</span>   <span class="hl-g">← checks: still under 15? yes.</span>
+│
+├─ <span class="hl-b">model [LLM Call #2]</span>                    <span class="hl-g">← qwen3.5:9b reads result (289s warm)</span>
+│   output: text answer, tool_calls=<span class="hl-gr">[]</span>
+│
+├─ <span class="hl-p">ModelCallLimitMiddleware.after_model</span>    <span class="hl-g">← records call_count=2</span>
+│
+└─ <span class="hl-gr">END</span>  <span class="hl-g">← tool_calls=[] → LangGraph exits loop</span>
+
+Total time:      626 seconds
+LLM calls:       2
+Tool calls:      1
+Loop iterations: 1</pre>
+</div>
+
+<!-- ===== MEMORY ===== -->
+<div class="phase-card" id="memory">
+  <div class="phase-bar phase-memory">memory_enabled=True — what it actually does</div>
+<pre>agent = MCPAgent(..., <span class="hl-a">memory_enabled=True</span>)</pre>
+
+  <div class="two-col">
+    <div class="col-box">
+      <div class="col-title bad">Without memory (default)</div>
+<pre style="font-size:11px">agent.run("Weather in Tokyo?")
+→ answers
+
+agent.run("Forecast for Tokyo?")
+→ <span class="hl-r">LLM has NO idea</span>
+  what "Tokyo" refers to</pre>
+    </div>
+    <div class="col-box">
+      <div class="col-title good">With memory_enabled=True</div>
+<pre style="font-size:11px">agent.run("Weather in Tokyo?")
+→ answers
+
+agent.run("Forecast for Tokyo?")
+→ <span class="hl-t">full first conversation</span>
+  in context → knows Tokyo</pre>
+    </div>
+  </div>
+
+  <div class="meaning" style="margin-top:12px">
+    <div class="meaning-label">WHAT THIS MEANS:</div>
+    <p>The context window grows with each <code>agent.run()</code> call. Token counts increase because the entire previous conversation is prepended to the next prompt. This is why your second query ("forecast for Tokyo? And NYC?") works — LLM already knows what Tokyo is from turn 1.</p>
+  </div>
+</div>
+
+<!-- ===== SUMMARY ===== -->
+<div class="phase-card" id="summary">
+  <div class="phase-bar phase-summary">COMPONENT SUMMARY — every piece and what it did in this run</div>
+  <table>
+    <thead>
+      <tr><th>Component</th><th>Role</th><th>What it did in this run</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>MCPClient</td>
+        <td>Connects to MCP servers</td>
+        <td>Spawned <code>server.py</code> as subprocess via stdio; sent <code>initialize</code> + <code>tools/list</code></td>
+      </tr>
+      <tr>
+        <td>mcp-use</td>
+        <td>MCP ↔ LangChain bridge</td>
+        <td>Auto-wrapped <code>get_weather</code> + <code>get_forecast</code> as LangChain tools; executed <code>tools/call</code> → returned ToolMessage</td>
+      </tr>
+      <tr>
+        <td>MCPAgent / LangGraph</td>
+        <td>Orchestrator loop</td>
+        <td>Ran model → tools → model until <code>tool_calls=[]</code>; enforced 15-step max via ModelCallLimitMiddleware</td>
+      </tr>
+      <tr>
+        <td>langchain-ollama</td>
+        <td>LLM bridge</td>
+        <td>Translated LangChain prompt format → Ollama REST API at <code>localhost:11434</code></td>
+      </tr>
+      <tr>
+        <td>qwen3.5:9b (Ollama)</td>
+        <td>LLM / brain</td>
+        <td>Call 1: read context → decided <code>get_weather</code> → returned JSON. Call 2: read tool result → wrote final text answer</td>
+      </tr>
+      <tr>
+        <td>server.py</td>
+        <td>MCP server</td>
+        <td>Exposed <code>get_weather</code> + <code>get_forecast</code>; called real weather API and returned result</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="meaning" style="margin-top:14px">
+    <div class="meaning-label">WHY THE FIRST LLM CALL WAS SLOW (334s):</div>
+    <p>The model was loading cold into memory. <code>load_duration: 107571784500ns</code> = ~107 seconds just for model load. The second call was 289s with only ~0.5s load time — model was already warm. On repeated queries in the same session, response times improve significantly.</p>
+  </div>
+</div>
+
+
+<!-- ===== CONTEXT WINDOW & TOKENS ===== -->
+<h2 id="tokens" style="margin-top:32px">Context Window &amp; Tokens</h2>
+
+<div class="phase-card">
+  <div class="phase-bar" style="background:#2C2C2A;color:#D3D1C7">What is a token?</div>
+  <div class="meaning">
+    <div class="meaning-label">DEFINITION</div>
+    <p>A token is a chunk of text — roughly <strong>0.75 words</strong> on average. The LLM doesn't see letters or words — it sees tokens. Every prompt you send and every response you get is measured in tokens.</p>
+  </div>
+<pre>
+"What is the weather in Tokyo?"
+
+  W<span class="hl-a">hat</span> | <span class="hl-a">is</span> | <span class="hl-a">the</span> | <span class="hl-a">weather</span> | <span class="hl-a">in</span> | <span class="hl-a">Tokyo</span> | <span class="hl-a">?</span>
+  tok1   tok2   tok3    tok4      tok5    tok6   tok7
+  <span class="hl-g">≈ 7 tokens   (roughly 1 token per word, punctuation counts too)</span>
+
+Rule of thumb:
+  100  tokens ≈  75 words ≈ half a page of text
+  1000 tokens ≈ 750 words ≈ a short article</pre>
+</div>
+
+<div class="phase-card">
+  <div class="phase-bar" style="background:#2C2C2A;color:#D3D1C7">What is the context window?</div>
+  <div class="meaning">
+    <div class="meaning-label">DEFINITION</div>
+    <p>The context window is the LLM's <strong>working memory</strong> — everything it can "see" at once when generating a response. It includes the system prompt, full conversation history, tool results, and your current question. Once full, old content gets dropped.</p>
+  </div>
+<pre>
+Think of it like a whiteboard with limited space:
+
+  ┌─────────────────────────────────────────────────┐
+  │  CONTEXT WINDOW  (e.g. 32,768 tokens max)       │
+  │                                                 │
+  │  <span class="hl-p">[System prompt + tool list]</span>   ~300 tokens      │
+  │  <span class="hl-a">[Turn 1 human question]</span>       ~20  tokens      │
+  │  <span class="hl-t">[Turn 1 AI tool call]</span>         ~50  tokens      │
+  │  <span class="hl-b">[Tool result injected]</span>        ~81  tokens      │
+  │  <span class="hl-t">[Turn 1 AI final answer]</span>      ~96  tokens      │
+  │  <span class="hl-a">[Your new question]</span>           ~10  tokens      │
+  └─────────────────────────────────────────────────┘
+  Total used: ~557 tokens. Still 32,211 tokens of room.</pre>
+</div>
+
+<div class="phase-card" style="border-color:#AFA9EC">
+  <div class="phase-bar" style="background:#3C3489;color:#CECBF6">From YOUR actual trace — watch the context window grow</div>
+
+  <div class="log-label">LLM Call #1 — 393 input tokens</div>
+  <div style="height:28px;border-radius:6px;background:#181818;overflow:hidden;display:flex;margin:6px 0 2px">
+    <div style="width:62%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#3C3489">system+tools ~300</div>
+    <div style="width:15%;background:#FAEEDA;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#633806">question ~53</div>
+    <div style="width:23%;background:#2C2C2A;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#888780">padding ~40</div>
+  </div>
+  <div style="font-size:11px;color:#666460;margin-bottom:14px">output: 73 tokens (just the tool call JSON — no text)</div>
+
+  <div class="log-label">LLM Call #2 — 474 input tokens (+81 from tool result)</div>
+  <div style="height:28px;border-radius:6px;background:#181818;overflow:hidden;display:flex;margin:6px 0 2px">
+    <div style="width:52%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#3C3489">system+tools ~300</div>
+    <div style="width:12%;background:#FAEEDA;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#633806">q ~53</div>
+    <div style="width:15%;background:#E1F5EE;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#085041">result +81</div>
+    <div style="width:21%;background:#2C2C2A;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#888780">other ~40</div>
+  </div>
+  <div style="font-size:11px;color:#666460;margin-bottom:14px">output: 96 tokens (full text answer)</div>
+
+  <div class="log-label">LLM Call #3 (2nd agent.run with memory_enabled=True) — even bigger</div>
+  <div style="height:28px;border-radius:6px;background:#181818;overflow:hidden;display:flex;margin:6px 0 2px">
+    <div style="width:35%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#3C3489">system+tools</div>
+    <div style="width:9%;background:#FAEEDA;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#633806">q1</div>
+    <div style="width:11%;background:#E1F5EE;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#085041">res1</div>
+    <div style="width:13%;background:#E6F1FB;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#0C447C">ans1</div>
+    <div style="width:32%;background:#FAC775;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#633806">new question + history</div>
+  </div>
+  <div style="font-size:11px;color:#666460">entire first conversation carried forward by memory_enabled=True</div>
+</div>
+
+<div class="phase-card">
+  <div class="phase-bar" style="background:#2C2C2A;color:#D3D1C7">Context window limits — different models, different sizes</div>
+<pre>
+MODEL                  CONTEXT WINDOW     ROUGHLY EQUIVALENT TO
+───────────────────────────────────────────────────────────────
+<span class="hl-b">qwen3.5:9b</span> (yours)    <span class="hl-a">32,768 tokens</span>      ~25,000 words / ~50 pages
+<span class="hl-b">Llama3.2:9b</span>           <span class="hl-a">128,000 tokens</span>     ~96,000 words / ~200 pages
+<span class="hl-b">Claude Sonnet 4</span>       <span class="hl-a">200,000 tokens</span>     ~150,000 words / ~300 pages
+<span class="hl-b">GPT-4o</span>                <span class="hl-a">128,000 tokens</span>     ~96,000 words / ~200 pages
+
+<span class="hl-g">Your qwen3.5:9b has 32K tokens.
+In your trace you used 474 tokens — only 1.4% of the limit.
+But with memory_enabled=True and many turns, it fills up fast.</span></pre>
+</div>
+
+<div class="phase-card">
+  <div class="phase-bar" style="background:#2C2C2A;color:#D3D1C7">Input tokens vs output tokens — why this matters for cost</div>
+<pre>
+Every LLM call has TWO token counts:
+
+  <span class="hl-b">Input tokens</span>  = everything the LLM READS
+                  (system prompt + history + tool list + your question)
+                  Charged at ~$3 per million tokens (Claude Sonnet)
+
+  <span class="hl-a">Output tokens</span> = everything the LLM WRITES
+                  (tool calls + final answer)
+                  Charged at ~$15 per million tokens (Claude Sonnet)
+
+From your trace:
+  Call 1:  <span class="hl-b">input=393</span>  <span class="hl-a">output=73</span>   total=466
+  Call 2:  <span class="hl-b">input=474</span>  <span class="hl-a">output=96</span>   total=570
+
+<span class="hl-gr">With Ollama locally → FREE. No token cost at all.
+With Claude API in prod → small cost, very predictable.</span>
+
+<span class="hl-g">This is why long conversations cost more — input grows with every turn.</span></pre>
+</div>
+
+<div class="phase-card">
+  <div class="phase-bar" style="background:#2C2C2A;color:#D3D1C7">What happens when you hit the token limit?</div>
+  <table>
+    <thead><tr><th>Scenario</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Context overflow</td>
+        <td>Oldest messages are silently dropped. LLM "forgets" early conversation.</td>
+        <td>Summarize old turns or use external memory (DynamoDB)</td>
+      </tr>
+      <tr>
+        <td>API error</td>
+        <td>Some APIs throw an error instead of truncating.</td>
+        <td>Sliding window — keep only last N turns in context</td>
+      </tr>
+      <tr>
+        <td>Slow responses</td>
+        <td>Larger context = more tokens to process = slower output.</td>
+        <td>Trim tool results before injecting (summarize, not raw data)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== MEMORY ENABLED ===== -->
+<h2 id="memory" style="margin-top:32px">memory_enabled=True — What it actually means</h2>
+
+<div class="phase-card">
+  <div class="phase-bar" style="background:#2C2C2A;color:#D3D1C7">Overview — False vs True</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
+    <div style="background:#1a0a0a;border:1px solid #F09595;border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:600;color:#F09595;margin-bottom:6px">memory_enabled=False (default)</div>
+      <div style="font-size:12px;color:#c8c6be;line-height:1.7">Each <code>agent.run()</code> call starts <strong>fresh</strong>. Only system prompt + new question. No history. LLM has zero knowledge of previous turns.</div>
+    </div>
+    <div style="background:#0a1a0e;border:1px solid #5DCAA5;border-radius:8px;padding:12px">
+      <div style="font-size:12px;font-weight:600;color:#5DCAA5;margin-bottom:6px">memory_enabled=True</div>
+      <div style="font-size:12px;color:#c8c6be;line-height:1.7">Each <code>agent.run()</code> call gets <strong>all previous messages appended</strong>. System + every Human + every AI + every Tool result — the full history.</div>
+    </div>
+  </div>
+</div>
+
+<div class="phase-card">
+  <div class="phase-bar" style="background:#3C3489;color:#CECBF6">What exactly is in the messages list — all 4 types</div>
+<pre>
+messages = [
+
+  <span class="hl-b">SystemMessage</span>    <span class="hl-gr">✓ always included</span>   <span class="hl-g">← system prompt + tool list (rebuilt fresh each call)</span>
+
+  <span class="hl-g">  ── everything below is the "memory" that grows ──</span>
+
+  <span class="hl-p">HumanMessage</span>     <span class="hl-gr">✓ carried forward</span>   <span class="hl-g">← your previous questions</span>
+  <span class="hl-p">AIMessage</span>        <span class="hl-gr">✓ carried forward</span>   <span class="hl-g">← LLM's tool call JSONs</span>
+  <span class="hl-t">ToolMessage</span>      <span class="hl-gr">✓ carried forward</span>   <span class="hl-g">← tool results injected back</span>
+  <span class="hl-p">AIMessage</span>        <span class="hl-gr">✓ carried forward</span>   <span class="hl-g">← LLM's final text answers</span>
+
+]
+
+<span class="hl-g">YES — all 4 message types accumulate and get passed on every agent.run() call.</span></pre>
+</div>
+
+<div class="phase-card">
+  <div class="phase-bar" style="background:#3C3489;color:#CECBF6">Side by side — 2nd agent.run() with and without memory</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
+
+    <div>
+      <div style="font-size:11px;font-weight:600;color:#F09595;margin-bottom:8px">memory=False — 2nd call context</div>
+      <div style="border-radius:8px;background:#181818;padding:10px">
+        <div style="display:flex;gap:6px;margin-bottom:5px;align-items:flex-start">
+          <span style="font-size:10px;font-weight:700;background:#E6F1FB;color:#0C447C;border-radius:3px;padding:1px 6px;flex-shrink:0">SYSTEM</span>
+          <span style="font-size:11px;font-family:monospace;color:#888780">tools: get_weather, get_forecast...</span>
+        </div>
+        <div style="display:flex;gap:6px;align-items:flex-start">
+          <span style="font-size:10px;font-weight:700;background:#FAC775;color:#633806;border-radius:3px;padding:1px 6px;flex-shrink:0">HUMAN</span>
+          <span style="font-size:11px;font-family:monospace;color:#c8c6be">What is the forecast?</span>
+        </div>
+      </div>
+      <div style="margin-top:8px;padding:8px;background:#1a0808;border-radius:6px;border:1px solid #F09595;font-size:11px;color:#F09595">
+        LLM has no idea "forecast" means Tokyo — never told. Will ask "forecast for where?" or guess wrong.
+      </div>
+      <div style="font-size:10px;color:#666460;margin-top:4px;text-align:right">~320 tokens</div>
+    </div>
+
+    <div>
+      <div style="font-size:11px;font-weight:600;color:#5DCAA5;margin-bottom:8px">memory=True — 2nd call context</div>
+      <div style="border-radius:8px;background:#181818;padding:10px">
+        <div style="display:flex;gap:6px;margin-bottom:5px;align-items:flex-start">
+          <span style="font-size:10px;font-weight:700;background:#E6F1FB;color:#0C447C;border-radius:3px;padding:1px 6px;flex-shrink:0">SYSTEM</span>
+          <span style="font-size:11px;font-family:monospace;color:#888780">tools: get_weather, get_forecast...</span>
+        </div>
+        <div style="border-left:2px solid #333;padding-left:8px;margin:6px 0;opacity:0.75">
+          <div style="font-size:9px;color:#666460;margin-bottom:4px">← carried from previous agent.run()</div>
+          <div style="display:flex;gap:6px;margin-bottom:4px;align-items:flex-start">
+            <span style="font-size:10px;font-weight:700;background:#F1EFE8;color:#444441;border-radius:3px;padding:1px 6px;flex-shrink:0">HUMAN</span>
+            <span style="font-size:11px;font-family:monospace;color:#888780">What is the weather in Tokyo?</span>
+          </div>
+          <div style="display:flex;gap:6px;margin-bottom:4px;align-items:flex-start">
+            <span style="font-size:10px;font-weight:700;background:#EEEDFE;color:#3C3489;border-radius:3px;padding:1px 6px;flex-shrink:0">AI</span>
+            <span style="font-size:11px;font-family:monospace;color:#888780">[tool_call: get_weather(city=Tokyo)]</span>
+          </div>
+          <div style="display:flex;gap:6px;margin-bottom:4px;align-items:flex-start">
+            <span style="font-size:10px;font-weight:700;background:#E1F5EE;color:#085041;border-radius:3px;padding:1px 6px;flex-shrink:0">TOOL</span>
+            <span style="font-size:11px;font-family:monospace;color:#888780">Patchy rain, 17°C, humidity 77%...</span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:flex-start">
+            <span style="font-size:10px;font-weight:700;background:#EEEDFE;color:#3C3489;border-radius:3px;padding:1px 6px;flex-shrink:0">AI</span>
+            <span style="font-size:11px;font-family:monospace;color:#888780">The weather in Tokyo is 17°C...</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:flex-start">
+          <span style="font-size:10px;font-weight:700;background:#FAC775;color:#633806;border-radius:3px;padding:1px 6px;flex-shrink:0">HUMAN</span>
+          <span style="font-size:11px;font-family:monospace;color:#c8c6be">What is the forecast?</span>
+        </div>
+      </div>
+      <div style="margin-top:8px;padding:8px;background:#0a1a0e;border-radius:6px;border:1px solid #5DCAA5;font-size:11px;color:#5DCAA5">
+        LLM sees everything. Knows "forecast" means Tokyo. Calls get_forecast(city=Tokyo) without asking.
+      </div>
+      <div style="font-size:10px;color:#666460;margin-top:4px;text-align:right">~890 tokens (+570 from history)</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="phase-card" style="border-color:#FAC775">
+  <div class="phase-bar" style="background:#633806;color:#FAC775">The trade-off — context grows with every turn</div>
+<pre>
+agent.run() call 1:  ~570  tokens in context
+agent.run() call 2:  ~890  tokens in context  (+320)
+agent.run() call 3:  ~1200 tokens in context  (+310)
+agent.run() call 4:  ~1500 tokens in context  (+300)
+...                                           keeps growing
+<span class="hl-r">agent.run() call N:  32,768 tokens            ← qwen3.5:9b LIMIT HIT</span>
+
+<span class="hl-g">memory=True is great for SHORT multi-turn conversations.
+For LONG sessions (like processing 50 PA requests), don't use it blindly.</span>
+
+</pre>
+</div>
+
+</body>
+</html>

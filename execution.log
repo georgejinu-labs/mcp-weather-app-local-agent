@@ -1,0 +1,712 @@
+C:\sources\georgejinu-labs\mcp-weather-app-local-agent> $env:WEATHER_AGENT_TRACE=1; uv run python src/client/agentic_client.py
+C:\sources\georgejinu-labs\mcp-weather-app-local-agent\.venv\Lib\site-packages\langchain_core\_api\deprecation.py:25: UserWarning: Core Pydantic V1 functionality isn't compatible with Python 3.14 or greater.
+  from pydantic.v1.fields import FieldInfo as FieldInfoV1
+2026-03-28 21:50:35,236 - mcp_use.telemetry.telemetry - INFO - Anonymized telemetry enabled. Set MCP_USE_ANONYMIZED_TELEMETRY=false to disable.
+2026-03-28 21:50:38,608 - mcp_use.agents.observability.callbacks_manager - DEBUG - ObservabilityManager: Using 1 custom callbacks
+
+===== Interactive MCP Chat =====
+(WEATHER_AGENT_TRACE=1: debug logs on stdout/stderr; context dumps on stderr after each reply)
+
+2026-03-28 21:50:38,609 - mcp_use - INFO - 🚀 Initializing MCP agent and connecting to services...
+2026-03-28 21:50:38,609 - mcp_use - INFO - 🔌 Found 0 existing sessions
+2026-03-28 21:50:38,609 - mcp_use - INFO - 🔄 No active sessions found, creating new ones...
+2026-03-28 21:50:38,648 - mcp_use - DEBUG - Connecting to MCP implementation: uv
+2026-03-28 21:50:38,648 - mcp_use - DEBUG - Starting StdioConnectionManager task
+2026-03-28 21:50:38,671 - mcp_use - DEBUG - StdioConnectionManager connected successfully
+2026-03-28 21:50:38,672 - mcp_use - DEBUG - Successfully connected to MCP implementation: uv
+2026-03-28 21:50:38,672 - mcp_use - DEBUG - [2af98457-61d1-4fea-a336-e5dbea98772e] stdio:uv run src/server.py -> initialize
+2026-03-28 21:50:42,862 - mcp_use - DEBUG - [2af98457-61d1-4fea-a336-e5dbea98772e] stdio:uv run src/server.py <- initialize (4.190s)
+2026-03-28 21:50:42,862 - mcp_use - DEBUG - [f8d32d12-ded9-42af-82bd-769b3839872e] stdio:uv run src/server.py -> tools/list
+2026-03-28 21:50:42,870 - mcp_use - DEBUG - [f8d32d12-ded9-42af-82bd-769b3839872e] stdio:uv run src/server.py <- tools/list (0.008s)
+2026-03-28 21:50:42,870 - mcp_use - DEBUG - [3e15f8a9-6640-41e2-b8c4-59cc1b9ab377] stdio:uv run src/server.py -> resources/list
+2026-03-28 21:50:42,873 - mcp_use - DEBUG - [3e15f8a9-6640-41e2-b8c4-59cc1b9ab377] stdio:uv run src/server.py <- resources/list (0.003s)
+2026-03-28 21:50:42,873 - mcp_use - DEBUG - [4e29e816-1c94-4697-afd0-b5bd2b0c02a8] stdio:uv run src/server.py -> prompts/list
+2026-03-28 21:50:42,876 - mcp_use - DEBUG - [4e29e816-1c94-4697-afd0-b5bd2b0c02a8] stdio:uv run src/server.py <- prompts/list (0.003s)
+2026-03-28 21:50:42,876 - mcp_use - DEBUG - MCP session initialized with 2 tools, 0 resources, and 0 prompts
+2026-03-28 21:50:42,877 - mcp_use - INFO - ✅ Created 1 new sessions
+2026-03-28 21:50:42,877 - mcp_use - DEBUG - Listing tools
+2026-03-28 21:50:42,877 - mcp_use - DEBUG - [dd9746e8-6030-4bbb-8cde-e38c7d909bf5] stdio:uv run src/server.py -> tools/list
+2026-03-28 21:50:42,880 - mcp_use - DEBUG - [dd9746e8-6030-4bbb-8cde-e38c7d909bf5] stdio:uv run src/server.py <- tools/list (0.003s)
+2026-03-28 21:50:42,893 - mcp_use - DEBUG - Loaded 2 new tools for connector: ['get_weather', 'get_forecast']
+2026-03-28 21:50:42,893 - mcp_use - DEBUG - Available tools: 2
+2026-03-28 21:50:42,893 - mcp_use - DEBUG - Listing resources
+2026-03-28 21:50:42,894 - mcp_use - DEBUG - [0893c4e6-ba2c-4da4-bbde-133217ee8874] stdio:uv run src/server.py -> resources/list
+2026-03-28 21:50:42,897 - mcp_use - DEBUG - [0893c4e6-ba2c-4da4-bbde-133217ee8874] stdio:uv run src/server.py <- resources/list (0.003s)
+2026-03-28 21:50:42,897 - mcp_use - DEBUG - Loaded 0 new resources for connector: []
+2026-03-28 21:50:42,897 - mcp_use - DEBUG - Available resources: 0
+2026-03-28 21:50:42,897 - mcp_use - DEBUG - Listing prompts
+2026-03-28 21:50:42,898 - mcp_use - DEBUG - [370af421-e706-4075-8a58-b3bd3796659b] stdio:uv run src/server.py -> prompts/list
+2026-03-28 21:50:42,902 - mcp_use - DEBUG - [370af421-e706-4075-8a58-b3bd3796659b] stdio:uv run src/server.py <- prompts/list (0.004s)
+2026-03-28 21:50:42,902 - mcp_use - DEBUG - Loaded 0 new prompts for connector: []
+2026-03-28 21:50:42,902 - mcp_use - DEBUG - Available prompts: 0
+2026-03-28 21:50:42,902 - mcp_use - DEBUG - Adapter create_all completed: 2 tools, 0 resources, 0 prompts
+2026-03-28 21:50:42,903 - mcp_use - INFO - 🛠️ Created 2 LangChain tools from client: 2 tools, 0 resources, 0 prompts
+2026-03-28 21:50:42,903 - mcp_use - INFO - 🧰 Found 2 tools across all connectors
+2026-03-28 21:50:42,903 - mcp_use - DEBUG - Creating new agent with 2 tools
+2026-03-28 21:50:42,903 - mcp_use - INFO - 🧠 Agent ready with tools: get_weather, get_forecast
+2026-03-28 21:50:42,903 - mcp_use - DEBUG - Tool error handler middleware enabled (retry_on_error=True)
+2026-03-28 21:50:42,924 - mcp_use - DEBUG - Created agent with max_steps=15 (via ModelCallLimitMiddleware) and 1 callbacks
+2026-03-28 21:50:42,925 - mcp_use - INFO - ✨ Agent initialization complete
+2026-03-28 21:50:42,925 - mcp_use - INFO - 💬 Received query: 'What is the weather in Tokyo?'
+2026-03-28 21:50:42,925 - mcp_use - INFO - 🏁 Starting agent execution
+
+
+> Entering new LangGraph chain...
+[chain/start] [chain:LangGraph] Entering Chain run with input:
+[inputs]
+[values] {'messages': [HumanMessage(content='What is the weather in Tokyo?', additional_kwargs={}, response_metadata={}, id='7d44f262-dff9-4568-bb96-af5657c3e81b')]}
+
+
+> Entering new ModelCallLimitMiddleware.before_model chain...
+[chain/start] [chain:LangGraph > chain:ModelCallLimitMiddleware.before_model] Entering Chain run with input:
+[inputs]
+
+> Finished chain.
+[chain/end] [chain:LangGraph > chain:ModelCallLimitMiddleware.before_model] [2ms] Exiting Chain run with output:
+{
+  "output": null
+}
+[updates] {'ModelCallLimitMiddleware.before_model': None}
+2026-03-28 21:50:42,941 - mcp_use - DEBUG - 📦 Node 'ModelCallLimitMiddleware.before_model' output: None
+
+
+> Entering new model chain...
+[chain/start] [chain:LangGraph > chain:model] Entering Chain run with input:
+[inputs]
+[llm/start] [chain:LangGraph > chain:model > llm:ChatOllama] Entering LLM run with input:
+{
+  "prompts": [
+    "System: You are a helpful AI assistant.\nYou have access to the following tools:\n\n- get_weather: Get the weather for a given city.\n- get_forecast: Get the forecast for a given city.\n\nUse these tools to help answer questions and complete tasks as needed.\nHuman: What is the weather in Tokyo?"
+  ]
+}
+[llm/end] [chain:LangGraph > chain:model > llm:ChatOllama] [334.08s] Exiting LLM run with output:
+{
+  "generations": [
+    [
+      {
+        "text": "",
+        "generation_info": {
+          "model": "qwen3.5:9b",
+          "created_at": "2026-03-29T01:56:17.0231047Z",
+          "done": true,
+          "done_reason": "stop",
+          "total_duration": 333781839300,
+          "load_duration": 107571784500,
+          "prompt_eval_count": 393,
+          "prompt_eval_duration": 157621966800,
+          "eval_count": 73,
+          "eval_duration": 68091261400,
+          "logprobs": null,
+          "model_name": "qwen3.5:9b",
+          "model_provider": "ollama"
+        },
+        "type": "ChatGeneration",
+        "message": {
+          "lc": 1,
+          "type": "constructor",
+          "id": [
+            "langchain",
+            "schema",
+            "messages",
+            "AIMessage"
+          ],
+          "kwargs": {
+            "content": "",
+            "response_metadata": {
+              "model": "qwen3.5:9b",
+              "created_at": "2026-03-29T01:56:17.0231047Z",
+              "done": true,
+              "done_reason": "stop",
+              "total_duration": 333781839300,
+              "load_duration": 107571784500,
+              "prompt_eval_count": 393,
+              "prompt_eval_duration": 157621966800,
+              "eval_count": 73,
+              "eval_duration": 68091261400,
+              "logprobs": null,
+              "model_name": "qwen3.5:9b",
+              "model_provider": "ollama"
+            },
+            "type": "ai",
+            "id": "lc_run--019d3749-490a-7f21-b25b-0e344f6ec771-0",
+            "tool_calls": [
+              {
+                "name": "get_weather",
+                "args": {
+                  "city": "Tokyo"
+                },
+                "id": "edf4a68f-0490-4e29-9e2e-4bb2d512227b",
+                "type": "tool_call"
+              }
+            ],
+            "usage_metadata": {
+              "input_tokens": 393,
+              "output_tokens": 73,
+              "total_tokens": 466
+            },
+            "invalid_tool_calls": []
+          }
+        }
+      }
+    ]
+  ],
+  "llm_output": null,
+  "run": null,
+  "type": "LLMResult"
+}
+
+> Finished chain.
+[chain/end] [chain:LangGraph > chain:model] [334.11s] Exiting Chain run with output:
+[outputs]
+[updates] {'model': {'messages': [AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T01:56:17.0231047Z', 'done': True, 'done_reason': 'stop', 'total_duration': 333781839300, 'load_duration': 107571784500, 'prompt_eval_count': 393, 'prompt_eval_duration': 157621966800, 'eval_count': 73, 'eval_duration': 68091261400, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3749-490a-7f21-b25b-0e344f6ec771-0', tool_calls=[{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 393, 'output_tokens': 73, 'total_tokens': 466})]}}
+2026-03-28 21:56:17,059 - mcp_use - DEBUG - 📦 Node 'model' output: {'messages': [AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T01:56:17.0231047Z', 'done': True, 'done_reason': 'stop', 'total_duration': 333781839300, 'load_duration': 107571784500, 'prompt_eval_count': 393, 'prompt_eval_duration': 157621966800, 'eval_count': 73, 'eval_duration': 68091261400, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3749-490a-7f21-b25b-0e344f6ec771-0', tool_calls=[{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 393, 'output_tokens': 73, 'total_tokens': 466})]}
+[values] {'messages': [HumanMessage(content='What is the weather in Tokyo?', additional_kwargs={}, response_metadata={}, id='7d44f262-dff9-4568-bb96-af5657c3e81b'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T01:56:17.0231047Z', 'done': True, 'done_reason': 'stop', 'total_duration': 333781839300, 'load_duration': 107571784500, 'prompt_eval_count': 393, 'prompt_eval_duration': 157621966800, 'eval_count': 73, 'eval_duration': 68091261400, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3749-490a-7f21-b25b-0e344f6ec771-0', tool_calls=[{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 393, 'output_tokens': 73, 'total_tokens': 466})]}
+
+
+> Entering new ModelCallLimitMiddleware.after_model chain...
+[chain/start] [chain:LangGraph > chain:ModelCallLimitMiddleware.after_model] Entering Chain run with input:
+[inputs]
+
+> Finished chain.
+[chain/end] [chain:LangGraph > chain:ModelCallLimitMiddleware.after_model] [3ms] Exiting Chain run with output:
+{
+  "thread_model_call_count": 1,
+  "run_model_call_count": 1
+}
+[updates] {'ModelCallLimitMiddleware.after_model': {'thread_model_call_count': 1, 'run_model_call_count': 1}}
+2026-03-28 21:56:17,071 - mcp_use - DEBUG - 📦 Node 'ModelCallLimitMiddleware.after_model' output: {'thread_model_call_count': 1, 'run_model_call_count': 1}
+[values] {'messages': [HumanMessage(content='What is the weather in Tokyo?', additional_kwargs={}, response_metadata={}, id='7d44f262-dff9-4568-bb96-af5657c3e81b'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T01:56:17.0231047Z', 'done': True, 'done_reason': 'stop', 'total_duration': 333781839300, 'load_duration': 107571784500, 'prompt_eval_count': 393, 'prompt_eval_duration': 157621966800, 'eval_count': 73, 'eval_duration': 68091261400, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3749-490a-7f21-b25b-0e344f6ec771-0', tool_calls=[{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 393, 'output_tokens': 73, 'total_tokens': 466})], 'thread_model_call_count': 1, 'run_model_call_count': 1}
+
+
+> Entering new tools chain...
+[chain/start] [chain:LangGraph > chain:tools] Entering Chain run with input:
+[inputs]
+[tool/start] [chain:LangGraph > chain:tools > tool:get_weather] Entering Tool run with input:
+"{'city': 'Tokyo'}"
+2026-03-28 21:56:17,086 - mcp_use - DEBUG - MCP tool: "get_weather" received input: {'city': 'Tokyo'}
+2026-03-28 21:56:17,086 - mcp_use - DEBUG - Calling tool 'get_weather' with arguments: {'city': 'Tokyo'}
+2026-03-28 21:56:17,087 - mcp_use - DEBUG - [1ca3ae51-aea4-45a2-ac5e-c8d166287709] stdio:uv run src/server.py -> tools/call
+2026-03-28 21:56:19,481 - mcp_use - DEBUG - [1ca3ae51-aea4-45a2-ac5e-c8d166287709] stdio:uv run src/server.py <- tools/call (2.394s)
+2026-03-28 21:56:19,482 - mcp_use - DEBUG - Tool 'get_weather' called with result: meta=None content=[TextContent(type='text', text='The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.', annotations=None, meta=None)] structuredContent={'result': 'The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.'} isError=False
+content='The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.' name='get_weather' tool_call_id='edf4a68f-0490-4e29-9e2e-4bb2d512227b'[tool/end] [chain:LangGraph > chain:tools > tool:get_weather] [2.40s] Exiting Tool run with output:
+"content='The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.' name='get_weather' tool_call_id='edf4a68f-0490-4e29-9e2e-4bb2d512227b'"
+
+> Finished chain.
+[chain/end] [chain:LangGraph > chain:tools] [2.41s] Exiting Chain run with output:
+[outputs]
+[updates] {'tools': {'messages': [ToolMessage(content='The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.', name='get_weather', id='c0d5cb86-f8ff-4853-825e-d4f6be8bd6f4', tool_call_id='edf4a68f-0490-4e29-9e2e-4bb2d512227b')]}}
+2026-03-28 21:56:19,490 - mcp_use - DEBUG - 📦 Node 'tools' output: {'messages': [ToolMessage(content='The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.', name='get_weather', id='c0d5cb86-f8ff-4853-825e-d4f6be8bd6f4', tool_call_id='edf4a68f-0490-4e29-9e2e-4bb2d512227b')]}
+
+╭──────────────────────────────────────────────────────────────────────────────────────────── 🔧 get_weather Input ─────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                                                                                                                               │
+│  {                                                                                                                                                                                                            │
+│    "city": "Tokyo"                                                                                                                                                                                            │
+│  }                                                                                                                                                                                                            │
+│                                                                                                                                                                                                               │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─────────────────────────────────────────────────────────────────────────────────────────────────── Result ────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                                                                                                                               │
+│  The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.                                                                         │
+│                                                                                                                                                                                                               │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+[values] {'messages': [HumanMessage(content='What is the weather in Tokyo?', additional_kwargs={}, response_metadata={}, id='7d44f262-dff9-4568-bb96-af5657c3e81b'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T01:56:17.0231047Z', 'done': True, 'done_reason': 'stop', 'total_duration': 333781839300, 'load_duration': 107571784500, 'prompt_eval_count': 393, 'prompt_eval_duration': 157621966800, 'eval_count': 73, 'eval_duration': 68091261400, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3749-490a-7f21-b25b-0e344f6ec771-0', tool_calls=[{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 393, 'output_tokens': 73, 'total_tokens': 466}), ToolMessage(content='The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.', name='get_weather', id='c0d5cb86-f8ff-4853-825e-d4f6be8bd6f4', tool_call_id='edf4a68f-0490-4e29-9e2e-4bb2d512227b')], 'thread_model_call_count': 1, 'run_model_call_count': 1}
+
+
+> Entering new ModelCallLimitMiddleware.before_model chain...
+[chain/start] [chain:LangGraph > chain:ModelCallLimitMiddleware.before_model] Entering Chain run with input:
+[inputs]
+
+> Finished chain.[chain/end] [chain:LangGraph > chain:ModelCallLimitMiddleware.before_model] [3ms] Exiting Chain run with output:
+{
+  "output": null
+}
+
+[updates] {'ModelCallLimitMiddleware.before_model': None}
+2026-03-28 21:56:19,609 - mcp_use - DEBUG - 📦 Node 'ModelCallLimitMiddleware.before_model' output: None
+
+
+> Entering new model chain...
+[chain/start] [chain:LangGraph > chain:model] Entering Chain run with input:
+[inputs]
+[llm/start] [chain:LangGraph > chain:model > llm:ChatOllama] Entering LLM run with input:
+{
+  "prompts": [
+    "System: You are a helpful AI assistant.\nYou have access to the following tools:\n\n- get_weather: Get the weather for a given city.\n- get_forecast: Get the forecast for a given city.\n\nUse these tools to help answer questions and complete tasks as needed.\nHuman: What is the weather in Tokyo?\nAI: [{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}]\nTool: The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction."
+  ]
+}
+[llm/end] [chain:LangGraph > chain:model > llm:ChatOllama] [289.27s] Exiting LLM run with output:
+{
+  "generations": [
+    [
+      {
+        "text": "The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?",
+        "generation_info": {
+          "model": "qwen3.5:9b",
+          "created_at": "2026-03-29T02:01:08.8649771Z",
+          "done": true,
+          "done_reason": "stop",
+          "total_duration": 289220280000,
+          "load_duration": 480521100,
+          "prompt_eval_count": 474,
+          "prompt_eval_duration": 196063728400,
+          "eval_count": 96,
+          "eval_duration": 92476251800,
+          "logprobs": null,
+          "model_name": "qwen3.5:9b",
+          "model_provider": "ollama"
+        },
+        "type": "ChatGeneration",
+        "message": {
+          "lc": 1,
+          "type": "constructor",
+          "id": [
+            "langchain",
+            "schema",
+            "messages",
+            "AIMessage"
+          ],
+          "kwargs": {
+            "content": "The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?",
+            "response_metadata": {
+              "model": "qwen3.5:9b",
+              "created_at": "2026-03-29T02:01:08.8649771Z",
+              "done": true,
+              "done_reason": "stop",
+              "total_duration": 289220280000,
+              "load_duration": 480521100,
+              "prompt_eval_count": 474,
+              "prompt_eval_duration": 196063728400,
+              "eval_count": 96,
+              "eval_duration": 92476251800,
+              "logprobs": null,
+              "model_name": "qwen3.5:9b",
+              "model_provider": "ollama"
+            },
+            "type": "ai",
+            "id": "lc_run--019d374e-6c2b-7933-9629-0609a3ce4374-0",
+            "usage_metadata": {
+              "input_tokens": 474,
+              "output_tokens": 96,
+              "total_tokens": 570
+            },
+            "tool_calls": [],
+            "invalid_tool_calls": []
+          }
+        }
+      }
+    ]
+  ],
+  "llm_output": null,
+  "run": null,
+  "type": "LLMResult"
+}
+
+> Finished chain.
+[chain/end] [chain:LangGraph > chain:model] [289.31s] Exiting Chain run with output:
+[outputs]
+[updates] {'model': {'messages': [AIMessage(content='The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:01:08.8649771Z', 'done': True, 'done_reason': 'stop', 'total_duration': 289220280000, 'load_duration': 480521100, 'prompt_eval_count': 474, 'prompt_eval_duration': 196063728400, 'eval_count': 96, 'eval_duration': 92476251800, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d374e-6c2b-7933-9629-0609a3ce4374-0', tool_calls=[], invalid_tool_calls=[], usage_metadata={'input_tokens': 474, 'output_tokens': 96, 'total_tokens': 570})]}}
+2026-03-28 22:01:08,949 - mcp_use - DEBUG - 📦 Node 'model' output: {'messages': [AIMessage(content='The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:01:08.8649771Z', 'done': True, 'done_reason': 'stop', 'total_duration': 289220280000, 'load_duration': 480521100, 'prompt_eval_count': 474, 'prompt_eval_duration': 196063728400, 'eval_count': 96, 'eval_duration': 92476251800, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d374e-6c2b-7933-9629-0609a3ce4374-0', tool_calls=[], invalid_tool_calls=[], usage_metadata={'input_tokens': 474, 'output_tokens': 96, 'total_tokens': 570})]}
+2026-03-28 22:01:08,954 - mcp_use - INFO - ✅ Agent finished with output
+[values] {'messages': [HumanMessage(content='What is the weather in Tokyo?', additional_kwargs={}, response_metadata={}, id='7d44f262-dff9-4568-bb96-af5657c3e81b'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T01:56:17.0231047Z', 'done': True, 'done_reason': 'stop', 'total_duration': 333781839300, 'load_duration': 107571784500, 'prompt_eval_count': 393, 'prompt_eval_duration': 157621966800, 'eval_count': 73, 'eval_duration': 68091261400, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3749-490a-7f21-b25b-0e344f6ec771-0', tool_calls=[{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 393, 'output_tokens': 73, 'total_tokens': 466}), ToolMessage(content='The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.', name='get_weather', id='c0d5cb86-f8ff-4853-825e-d4f6be8bd6f4', tool_call_id='edf4a68f-0490-4e29-9e2e-4bb2d512227b'), AIMessage(content='The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:01:08.8649771Z', 'done': True, 'done_reason': 'stop', 'total_duration': 289220280000, 'load_duration': 480521100, 'prompt_eval_count': 474, 'prompt_eval_duration': 196063728400, 'eval_count': 96, 'eval_duration': 92476251800, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d374e-6c2b-7933-9629-0609a3ce4374-0', tool_calls=[], invalid_tool_calls=[], usage_metadata={'input_tokens': 474, 'output_tokens': 96, 'total_tokens': 570})], 'thread_model_call_count': 1, 'run_model_call_count': 1}
+
+
+> Entering new ModelCallLimitMiddleware.after_model chain...
+[chain/start] [chain:LangGraph > chain:ModelCallLimitMiddleware.after_model] Entering Chain run with input:
+[inputs]
+
+> Finished chain.
+[chain/end] [chain:LangGraph > chain:ModelCallLimitMiddleware.after_model] [8ms] Exiting Chain run with output:
+{
+  "thread_model_call_count": 2,
+  "run_model_call_count": 2
+}
+[updates] {'ModelCallLimitMiddleware.after_model': {'thread_model_call_count': 2, 'run_model_call_count': 2}}
+2026-03-28 22:01:08,973 - mcp_use - DEBUG - 📦 Node 'ModelCallLimitMiddleware.after_model' output: {'thread_model_call_count': 2, 'run_model_call_count': 2}
+[values] {'messages': [HumanMessage(content='What is the weather in Tokyo?', additional_kwargs={}, response_metadata={}, id='7d44f262-dff9-4568-bb96-af5657c3e81b'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T01:56:17.0231047Z', 'done': True, 'done_reason': 'stop', 'total_duration': 333781839300, 'load_duration': 107571784500, 'prompt_eval_count': 393, 'prompt_eval_duration': 157621966800, 'eval_count': 73, 'eval_duration': 68091261400, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3749-490a-7f21-b25b-0e344f6ec771-0', tool_calls=[{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 393, 'output_tokens': 73, 'total_tokens': 466}), ToolMessage(content='The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.', name='get_weather', id='c0d5cb86-f8ff-4853-825e-d4f6be8bd6f4', tool_call_id='edf4a68f-0490-4e29-9e2e-4bb2d512227b'), AIMessage(content='The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:01:08.8649771Z', 'done': True, 'done_reason': 'stop', 'total_duration': 289220280000, 'load_duration': 480521100, 'prompt_eval_count': 474, 'prompt_eval_duration': 196063728400, 'eval_count': 96, 'eval_duration': 92476251800, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d374e-6c2b-7933-9629-0609a3ce4374-0', tool_calls=[], invalid_tool_calls=[], usage_metadata={'input_tokens': 474, 'output_tokens': 96, 'total_tokens': 570})], 'thread_model_call_count': 2, 'run_model_call_count': 2}
+
+> Finished chain.
+[chain/end] [chain:LangGraph] [626.05s] Exiting Chain run with output:
+[outputs]
+2026-03-28 22:01:08,978 - mcp_use - INFO - 🎉 Agent execution complete in 630.37 seconds
+The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:
+
+- Temperature: 17°C
+- Humidity: 77%
+- Wind speed: 22 km/h from the SW direction
+
+Would you like me to get a forecast for Tokyo as well?
+
+--- Context after first turn (before second user message) ---
+System message:
+You are a helpful AI assistant.
+You have access to the following tools:
+
+- get_weather: Get the weather for a given city.
+- get_forecast: Get the forecast for a given city.
+
+Use these tools to help answer questions and complete tasks as needed.
+Conversation history: 4 message(s)
+  [0] HumanMessage: 'What is the weather in Tokyo?'
+  [1] AIMessage: ''
+  [2] ToolMessage: 'The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.'
+  [3] AIMessage: 'The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?'
+2026-03-28 22:01:09,914 - mcp_use - INFO - 💬 Received query: 'What is the forecast for Tokyo? And what is the we...'
+2026-03-28 22:01:09,914 - mcp_use - INFO - 🏁 Starting agent execution
+
+
+> Entering new LangGraph chain...
+[chain/start] [chain:LangGraph] Entering Chain run with input:
+[inputs]
+[values] {'messages': [HumanMessage(content='What is the weather in Tokyo?', additional_kwargs={}, response_metadata={}, id='7d44f262-dff9-4568-bb96-af5657c3e81b'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T01:56:17.0231047Z', 'done': True, 'done_reason': 'stop', 'total_duration': 333781839300, 'load_duration': 107571784500, 'prompt_eval_count': 393, 'prompt_eval_duration': 157621966800, 'eval_count': 73, 'eval_duration': 68091261400, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3749-490a-7f21-b25b-0e344f6ec771-0', tool_calls=[{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 393, 'output_tokens': 73, 'total_tokens': 466}), ToolMessage(content='The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.', name='get_weather', id='c0d5cb86-f8ff-4853-825e-d4f6be8bd6f4', tool_call_id='edf4a68f-0490-4e29-9e2e-4bb2d512227b'), AIMessage(content='The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:01:08.8649771Z', 'done': True, 'done_reason': 'stop', 'total_duration': 289220280000, 'load_duration': 480521100, 'prompt_eval_count': 474, 'prompt_eval_duration': 196063728400, 'eval_count': 96, 'eval_duration': 92476251800, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d374e-6c2b-7933-9629-0609a3ce4374-0', tool_calls=[], invalid_tool_calls=[], usage_metadata={'input_tokens': 474, 'output_tokens': 96, 'total_tokens': 570}), HumanMessage(content='What is the forecast for Tokyo? And what is the weather in NYC?', additional_kwargs={}, response_metadata={}, id='3466c77a-7ba1-48cc-8cf3-f8700d068aea')]}
+
+
+> Entering new ModelCallLimitMiddleware.before_model chain...
+[chain/start] [chain:LangGraph > chain:ModelCallLimitMiddleware.before_model] Entering Chain run with input:
+[inputs]
+
+> Finished chain.
+[chain/end] [chain:LangGraph > chain:ModelCallLimitMiddleware.before_model] [5ms] Exiting Chain run with output:
+{
+  "output": null
+}
+[updates] {'ModelCallLimitMiddleware.before_model': None}
+2026-03-28 22:01:09,938 - mcp_use - DEBUG - 📦 Node 'ModelCallLimitMiddleware.before_model' output: None
+
+
+> Entering new model chain...
+[chain/start] [chain:LangGraph > chain:model] Entering Chain run with input:
+[inputs]
+[llm/start] [chain:LangGraph > chain:model > llm:ChatOllama] Entering LLM run with input:
+{
+  "prompts": [
+    "System: You are a helpful AI assistant.\nYou have access to the following tools:\n\n- get_weather: Get the weather for a given city.\n- get_forecast: Get the forecast for a given city.\n\nUse these tools to help answer questions and complete tasks as needed.\nHuman: What is the weather in Tokyo?\nAI: [{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}]\nTool: The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.\nAI: The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?\nHuman: What is the forecast for Tokyo? And what is the weather in NYC?"
+  ]
+}
+[llm/end] [chain:LangGraph > chain:model > llm:ChatOllama] [362.42s] Exiting LLM run with output:
+{
+  "generations": [
+    [
+      {
+        "text": "",
+        "generation_info": {
+          "model": "qwen3.5:9b",
+          "created_at": "2026-03-29T02:07:12.3665018Z",
+          "done": true,
+          "done_reason": "stop",
+          "total_duration": 362403527400,
+          "load_duration": 380420400,
+          "prompt_eval_count": 558,
+          "prompt_eval_duration": 242185354900,
+          "eval_count": 124,
+          "eval_duration": 119596386200,
+          "logprobs": null,
+          "model_name": "qwen3.5:9b",
+          "model_provider": "ollama"
+        },
+        "type": "ChatGeneration",
+        "message": {
+          "lc": 1,
+          "type": "constructor",
+          "id": [
+            "langchain",
+            "schema",
+            "messages",
+            "AIMessage"
+          ],
+          "kwargs": {
+            "content": "",
+            "response_metadata": {
+              "model": "qwen3.5:9b",
+              "created_at": "2026-03-29T02:07:12.3665018Z",
+              "done": true,
+              "done_reason": "stop",
+              "total_duration": 362403527400,
+              "load_duration": 380420400,
+              "prompt_eval_count": 558,
+              "prompt_eval_duration": 242185354900,
+              "eval_count": 124,
+              "eval_duration": 119596386200,
+              "logprobs": null,
+              "model_name": "qwen3.5:9b",
+              "model_provider": "ollama"
+            },
+            "type": "ai",
+            "id": "lc_run--019d3752-da43-75a2-a730-f97b9fb6fb79-0",
+            "tool_calls": [
+              {
+                "name": "get_forecast",
+                "args": {
+                  "city": "Tokyo"
+                },
+                "id": "12d61640-4b62-43a8-8557-228a4574b7f4",
+                "type": "tool_call"
+              },
+              {
+                "name": "get_weather",
+                "args": {
+                  "city": "NYC"
+                },
+                "id": "0e03e7b9-bc55-4160-b1cb-41d25dc25c46",
+                "type": "tool_call"
+              }
+            ],
+            "usage_metadata": {
+              "input_tokens": 558,
+              "output_tokens": 124,
+              "total_tokens": 682
+            },
+            "invalid_tool_calls": []
+          }
+        }
+      }
+    ]
+  ],
+  "llm_output": null,
+  "run": null,
+  "type": "LLMResult"
+}
+
+> Finished chain.
+[chain/end] [chain:LangGraph > chain:model] [362.44s] Exiting Chain run with output:
+[outputs]
+[updates] {'model': {'messages': [AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:07:12.3665018Z', 'done': True, 'done_reason': 'stop', 'total_duration': 362403527400, 'load_duration': 380420400, 'prompt_eval_count': 558, 'prompt_eval_duration': 242185354900, 'eval_count': 124, 'eval_duration': 119596386200, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3752-da43-75a2-a730-f97b9fb6fb79-0', tool_calls=[{'name': 'get_forecast', 'args': {'city': 'Tokyo'}, 'id': '12d61640-4b62-43a8-8557-228a4574b7f4', 'type': 'tool_call'}, {'name': 'get_weather', 'args': {'city': 'NYC'}, 'id': '0e03e7b9-bc55-4160-b1cb-41d25dc25c46', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 558, 'output_tokens': 124, 'total_tokens': 682})]}}
+2026-03-28 22:07:12,384 - mcp_use - DEBUG - 📦 Node 'model' output: {'messages': [AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:07:12.3665018Z', 'done': True, 'done_reason': 'stop', 'total_duration': 362403527400, 'load_duration': 380420400, 'prompt_eval_count': 558, 'prompt_eval_duration': 242185354900, 'eval_count': 124, 'eval_duration': 119596386200, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3752-da43-75a2-a730-f97b9fb6fb79-0', tool_calls=[{'name': 'get_forecast', 'args': {'city': 'Tokyo'}, 'id': '12d61640-4b62-43a8-8557-228a4574b7f4', 'type': 'tool_call'}, {'name': 'get_weather', 'args': {'city': 'NYC'}, 'id': '0e03e7b9-bc55-4160-b1cb-41d25dc25c46', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 558, 'output_tokens': 124, 'total_tokens': 682})]}
+[values] {'messages': [HumanMessage(content='What is the weather in Tokyo?', additional_kwargs={}, response_metadata={}, id='7d44f262-dff9-4568-bb96-af5657c3e81b'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T01:56:17.0231047Z', 'done': True, 'done_reason': 'stop', 'total_duration': 333781839300, 'load_duration': 107571784500, 'prompt_eval_count': 393, 'prompt_eval_duration': 157621966800, 'eval_count': 73, 'eval_duration': 68091261400, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3749-490a-7f21-b25b-0e344f6ec771-0', tool_calls=[{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 393, 'output_tokens': 73, 'total_tokens': 466}), ToolMessage(content='The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.', name='get_weather', id='c0d5cb86-f8ff-4853-825e-d4f6be8bd6f4', tool_call_id='edf4a68f-0490-4e29-9e2e-4bb2d512227b'), AIMessage(content='The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:01:08.8649771Z', 'done': True, 'done_reason': 'stop', 'total_duration': 289220280000, 'load_duration': 480521100, 'prompt_eval_count': 474, 'prompt_eval_duration': 196063728400, 'eval_count': 96, 'eval_duration': 92476251800, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d374e-6c2b-7933-9629-0609a3ce4374-0', tool_calls=[], invalid_tool_calls=[], usage_metadata={'input_tokens': 474, 'output_tokens': 96, 'total_tokens': 570}), HumanMessage(content='What is the forecast for Tokyo? And what is the weather in NYC?', additional_kwargs={}, response_metadata={}, id='3466c77a-7ba1-48cc-8cf3-f8700d068aea'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:07:12.3665018Z', 'done': True, 'done_reason': 'stop', 'total_duration': 362403527400, 'load_duration': 380420400, 'prompt_eval_count': 558, 'prompt_eval_duration': 242185354900, 'eval_count': 124, 'eval_duration': 119596386200, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3752-da43-75a2-a730-f97b9fb6fb79-0', tool_calls=[{'name': 'get_forecast', 'args': {'city': 'Tokyo'}, 'id': '12d61640-4b62-43a8-8557-228a4574b7f4', 'type': 'tool_call'}, {'name': 'get_weather', 'args': {'city': 'NYC'}, 'id': '0e03e7b9-bc55-4160-b1cb-41d25dc25c46', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 558, 'output_tokens': 124, 'total_tokens': 682})]}
+
+
+> Entering new ModelCallLimitMiddleware.after_model chain...
+[chain/start] [chain:LangGraph > chain:ModelCallLimitMiddleware.after_model] Entering Chain run with input:
+[inputs]
+
+> Finished chain.
+[chain/end] [chain:LangGraph > chain:ModelCallLimitMiddleware.after_model] [4ms] Exiting Chain run with output:
+{
+  "thread_model_call_count": 1,
+  "run_model_call_count": 1
+}
+[updates] {'ModelCallLimitMiddleware.after_model': {'thread_model_call_count': 1, 'run_model_call_count': 1}}
+2026-03-28 22:07:12,398 - mcp_use - DEBUG - 📦 Node 'ModelCallLimitMiddleware.after_model' output: {'thread_model_call_count': 1, 'run_model_call_count': 1}
+[values] {'messages': [HumanMessage(content='What is the weather in Tokyo?', additional_kwargs={}, response_metadata={}, id='7d44f262-dff9-4568-bb96-af5657c3e81b'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T01:56:17.0231047Z', 'done': True, 'done_reason': 'stop', 'total_duration': 333781839300, 'load_duration': 107571784500, 'prompt_eval_count': 393, 'prompt_eval_duration': 157621966800, 'eval_count': 73, 'eval_duration': 68091261400, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3749-490a-7f21-b25b-0e344f6ec771-0', tool_calls=[{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 393, 'output_tokens': 73, 'total_tokens': 466}), ToolMessage(content='The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.', name='get_weather', id='c0d5cb86-f8ff-4853-825e-d4f6be8bd6f4', tool_call_id='edf4a68f-0490-4e29-9e2e-4bb2d512227b'), AIMessage(content='The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:01:08.8649771Z', 'done': True, 'done_reason': 'stop', 'total_duration': 289220280000, 'load_duration': 480521100, 'prompt_eval_count': 474, 'prompt_eval_duration': 196063728400, 'eval_count': 96, 'eval_duration': 92476251800, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d374e-6c2b-7933-9629-0609a3ce4374-0', tool_calls=[], invalid_tool_calls=[], usage_metadata={'input_tokens': 474, 'output_tokens': 96, 'total_tokens': 570}), HumanMessage(content='What is the forecast for Tokyo? And what is the weather in NYC?', additional_kwargs={}, response_metadata={}, id='3466c77a-7ba1-48cc-8cf3-f8700d068aea'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:07:12.3665018Z', 'done': True, 'done_reason': 'stop', 'total_duration': 362403527400, 'load_duration': 380420400, 'prompt_eval_count': 558, 'prompt_eval_duration': 242185354900, 'eval_count': 124, 'eval_duration': 119596386200, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3752-da43-75a2-a730-f97b9fb6fb79-0', tool_calls=[{'name': 'get_forecast', 'args': {'city': 'Tokyo'}, 'id': '12d61640-4b62-43a8-8557-228a4574b7f4', 'type': 'tool_call'}, {'name': 'get_weather', 'args': {'city': 'NYC'}, 'id': '0e03e7b9-bc55-4160-b1cb-41d25dc25c46', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 558, 'output_tokens': 124, 'total_tokens': 682})], 'thread_model_call_count': 1, 'run_model_call_count': 1}
+
+
+> Entering new tools chain...
+[chain/start] [chain:LangGraph > chain:tools] Entering Chain run with input:
+[inputs]
+[chain/start] [chain:LangGraph > chain:tools] Entering Chain run with input:
+[inputs]
+
+
+> Entering new tools chain...
+[tool/start] [chain:LangGraph > chain:tools > tool:get_weather] Entering Tool run with input:
+"{'city': 'NYC'}"
+[tool/start] [chain:LangGraph > chain:tools > tool:get_forecast] Entering Tool run with input:
+"{'city': 'Tokyo'}"
+2026-03-28 22:07:12,423 - mcp_use - DEBUG - MCP tool: "get_weather" received input: {'city': 'NYC'}
+2026-03-28 22:07:12,423 - mcp_use - DEBUG - Calling tool 'get_weather' with arguments: {'city': 'NYC'}
+2026-03-28 22:07:12,424 - mcp_use - DEBUG - [49c76b7f-3468-4bf8-931e-a21ea9a9fc7d] stdio:uv run src/server.py -> tools/call
+2026-03-28 22:07:12,441 - mcp_use - DEBUG - MCP tool: "get_forecast" received input: {'city': 'Tokyo'}
+2026-03-28 22:07:12,442 - mcp_use - DEBUG - Calling tool 'get_forecast' with arguments: {'city': 'Tokyo'}
+2026-03-28 22:07:12,446 - mcp_use - DEBUG - [07f62b4b-cad4-4904-a507-f0bc9bcfc656] stdio:uv run src/server.py -> tools/call
+2026-03-28 22:07:15,346 - mcp_use - DEBUG - [07f62b4b-cad4-4904-a507-f0bc9bcfc656] stdio:uv run src/server.py <- tools/call (2.900s)
+2026-03-28 22:07:15,347 - mcp_use - DEBUG - Tool 'get_forecast' called with result: meta=None content=[TextContent(type='text', text='The forecast for Tokyo is Clear  with a temperature of 16°C, humidity of 77%, wind speed of 19 km/h from the SW direction and gust speed of 28 km/h.', annotations=None, meta=None)] structuredContent={'result': 'The forecast for Tokyo is Clear  with a temperature of 16°C, humidity of 77%, wind speed of 19 km/h from the SW direction and gust speed of 28 km/h.'} isError=False
+content='The forecast for Tokyo is Clear  with a temperature of 16°C, humidity of 77%, wind speed of 19 km/h from the SW direction and gust speed of 28 km/h.' name='get_forecast' tool_call_id='12d61640-4b62-43a8-8557-228a4574b7f4'[tool/end] [chain:LangGraph > chain:tools > tool:get_forecast] [2.93s] Exiting Tool run with output:
+"content='The forecast for Tokyo is Clear  with a temperature of 16°C, humidity of 77%, wind speed of 19 km/h from the SW direction and gust speed of 28 km/h.' name='get_forecast' tool_call_id='12d61640-4b62-43a8-8557-228a4574b7f4'"
+
+> Finished chain.
+[chain/end] [chain:LangGraph > chain:tools] [2.95s] Exiting Chain run with output:
+[outputs]
+[updates] {'tools': {'messages': [ToolMessage(content='The forecast for Tokyo is Clear  with a temperature of 16°C, humidity of 77%, wind speed of 19 km/h from the SW direction and gust speed of 28 km/h.', name='get_forecast', id='53d92700-a038-4cc7-b6c6-a8d80d3d97cb', tool_call_id='12d61640-4b62-43a8-8557-228a4574b7f4')]}}
+2026-03-28 22:07:15,355 - mcp_use - DEBUG - 📦 Node 'tools' output: {'messages': [ToolMessage(content='The forecast for Tokyo is Clear  with a temperature of 16°C, humidity of 77%, wind speed of 19 km/h from the SW direction and gust speed of 28 km/h.', name='get_forecast', id='53d92700-a038-4cc7-b6c6-a8d80d3d97cb', tool_call_id='12d61640-4b62-43a8-8557-228a4574b7f4')]}
+
+╭──────────────────────────────────────────────────────────────────────────────────────────── 🔧 get_forecast Input ────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                                                                                                                               │
+│  {                                                                                                                                                                                                            │
+│    "city": "Tokyo"                                                                                                                                                                                            │
+│  }                                                                                                                                                                                                            │
+│                                                                                                                                                                                                               │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─────────────────────────────────────────────────────────────────────────────────────────────────── Result ────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                                                                                                                               │
+│  The forecast for Tokyo is Clear  with a temperature of 16°C, humidity of 77%, wind speed of 19 km/h from the SW direction and gust speed of 28 km/h.                                                         │
+│                                                                                                                                                                                                               │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+2026-03-28 22:07:15,382 - mcp_use - DEBUG - [49c76b7f-3468-4bf8-931e-a21ea9a9fc7d] stdio:uv run src/server.py <- tools/call (2.958s)
+2026-03-28 22:07:15,382 - mcp_use - DEBUG - Tool 'get_weather' called with result: meta=None content=[TextContent(type='text', text='The weather in NYC is Clear with a temperature of 4°C, humidity of 26%, wind speed of 15 km/h from the NNW direction.', annotations=None, meta=None)] structuredContent={'result': 'The weather in NYC is Clear with a temperature of 4°C, humidity of 26%, wind speed of 15 km/h from the NNW direction.'} isError=False
+[tool/end] [chain:LangGraph > chain:tools > tool:get_weather] [2.96s] Exiting Tool run with output:
+"content='The weather in NYC is Clear with a temperature of 4°C, humidity of 26%, wind speed of 15 km/h from the NNW direction.' name='get_weather' tool_call_id='0e03e7b9-bc55-4160-b1cb-41d25dc25c46'"content='The weather in NYC is Clear with a temperature of 4°C, humidity of 26%, wind speed of 15 km/h from the NNW direction.' name='get_weather' tool_call_id='0e03e7b9-bc55-4160-b1cb-41d25dc25c46'
+
+> Finished chain.
+[chain/end] [chain:LangGraph > chain:tools] [2.98s] Exiting Chain run with output:
+[outputs]
+[updates] {'tools': {'messages': [ToolMessage(content='The weather in NYC is Clear with a temperature of 4°C, humidity of 26%, wind speed of 15 km/h from the NNW direction.', name='get_weather', id='49199192-f50f-4272-a82b-9f290526405a', tool_call_id='0e03e7b9-bc55-4160-b1cb-41d25dc25c46')]}}
+2026-03-28 22:07:15,387 - mcp_use - DEBUG - 📦 Node 'tools' output: {'messages': [ToolMessage(content='The weather in NYC is Clear with a temperature of 4°C, humidity of 26%, wind speed of 15 km/h from the NNW direction.', name='get_weather', id='49199192-f50f-4272-a82b-9f290526405a', tool_call_id='0e03e7b9-bc55-4160-b1cb-41d25dc25c46')]}
+
+╭──────────────────────────────────────────────────────────────────────────────────────────── 🔧 get_weather Input ─────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                                                                                                                               │
+│  {                                                                                                                                                                                                            │
+│    "city": "NYC"                                                                                                                                                                                              │
+│  }                                                                                                                                                                                                            │
+│                                                                                                                                                                                                               │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─────────────────────────────────────────────────────────────────────────────────────────────────── Result ────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                                                                                                                               │
+│  The weather in NYC is Clear with a temperature of 4°C, humidity of 26%, wind speed of 15 km/h from the NNW direction.                                                                                        │
+│                                                                                                                                                                                                               │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+[values] {'messages': [HumanMessage(content='What is the weather in Tokyo?', additional_kwargs={}, response_metadata={}, id='7d44f262-dff9-4568-bb96-af5657c3e81b'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T01:56:17.0231047Z', 'done': True, 'done_reason': 'stop', 'total_duration': 333781839300, 'load_duration': 107571784500, 'prompt_eval_count': 393, 'prompt_eval_duration': 157621966800, 'eval_count': 73, 'eval_duration': 68091261400, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3749-490a-7f21-b25b-0e344f6ec771-0', tool_calls=[{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 393, 'output_tokens': 73, 'total_tokens': 466}), ToolMessage(content='The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.', name='get_weather', id='c0d5cb86-f8ff-4853-825e-d4f6be8bd6f4', tool_call_id='edf4a68f-0490-4e29-9e2e-4bb2d512227b'), AIMessage(content='The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:01:08.8649771Z', 'done': True, 'done_reason': 'stop', 'total_duration': 289220280000, 'load_duration': 480521100, 'prompt_eval_count': 474, 'prompt_eval_duration': 196063728400, 'eval_count': 96, 'eval_duration': 92476251800, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d374e-6c2b-7933-9629-0609a3ce4374-0', tool_calls=[], invalid_tool_calls=[], usage_metadata={'input_tokens': 474, 'output_tokens': 96, 'total_tokens': 570}), HumanMessage(content='What is the forecast for Tokyo? And what is the weather in NYC?', additional_kwargs={}, response_metadata={}, id='3466c77a-7ba1-48cc-8cf3-f8700d068aea'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:07:12.3665018Z', 'done': True, 'done_reason': 'stop', 'total_duration': 362403527400, 'load_duration': 380420400, 'prompt_eval_count': 558, 'prompt_eval_duration': 242185354900, 'eval_count': 124, 'eval_duration': 119596386200, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3752-da43-75a2-a730-f97b9fb6fb79-0', tool_calls=[{'name': 'get_forecast', 'args': {'city': 'Tokyo'}, 'id': '12d61640-4b62-43a8-8557-228a4574b7f4', 'type': 'tool_call'}, {'name': 'get_weather', 'args': {'city': 'NYC'}, 'id': '0e03e7b9-bc55-4160-b1cb-41d25dc25c46', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 558, 'output_tokens': 124, 'total_tokens': 682}), ToolMessage(content='The forecast for Tokyo is Clear  with a temperature of 16°C, humidity of 77%, wind speed of 19 km/h from the SW direction and gust speed of 28 km/h.', name='get_forecast', id='53d92700-a038-4cc7-b6c6-a8d80d3d97cb', tool_call_id='12d61640-4b62-43a8-8557-228a4574b7f4'), ToolMessage(content='The weather in NYC is Clear with a temperature of 4°C, humidity of 26%, wind speed of 15 km/h from the NNW direction.', name='get_weather', id='49199192-f50f-4272-a82b-9f290526405a', tool_call_id='0e03e7b9-bc55-4160-b1cb-41d25dc25c46')], 'thread_model_call_count': 1, 'run_model_call_count': 1}
+[chain/start] [chain:LangGraph > chain:ModelCallLimitMiddleware.before_model] Entering Chain run with input:
+[inputs]
+
+> Entering new ModelCallLimitMiddleware.before_model chain...
+
+
+> Finished chain.[chain/end] [chain:LangGraph > chain:ModelCallLimitMiddleware.before_model] [2ms] Exiting Chain run with output:
+{
+  "output": null
+}
+
+[updates] {'ModelCallLimitMiddleware.before_model': None}
+2026-03-28 22:07:15,403 - mcp_use - DEBUG - 📦 Node 'ModelCallLimitMiddleware.before_model' output: None
+
+
+> Entering new model chain...
+[chain/start] [chain:LangGraph > chain:model] Entering Chain run with input:
+[inputs]
+[llm/start] [chain:LangGraph > chain:model > llm:ChatOllama] Entering LLM run with input:
+{
+  "prompts": [
+    "System: You are a helpful AI assistant.\nYou have access to the following tools:\n\n- get_weather: Get the weather for a given city.\n- get_forecast: Get the forecast for a given city.\n\nUse these tools to help answer questions and complete tasks as needed.\nHuman: What is the weather in Tokyo?\nAI: [{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}]\nTool: The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.\nAI: The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?\nHuman: What is the forecast for Tokyo? And what is the weather in NYC?\nAI: [{'name': 'get_forecast', 'args': {'city': 'Tokyo'}, 'id': '12d61640-4b62-43a8-8557-228a4574b7f4', 'type': 'tool_call'}, {'name': 'get_weather', 'args': {'city': 'NYC'}, 'id': '0e03e7b9-bc55-4160-b1cb-41d25dc25c46', 'type': 'tool_call'}]\nTool: The forecast for Tokyo is Clear  with a temperature of 16°C, humidity of 77%, wind speed of 19 km/h from the SW direction and gust speed of 28 km/h.\nTool: The weather in NYC is Clear with a temperature of 4°C, humidity of 26%, wind speed of 15 km/h from the NNW direction."
+  ]
+}
+[llm/end] [chain:LangGraph > chain:model > llm:ChatOllama] [225.49s] Exiting LLM run with output:
+{
+  "generations": [
+    [
+      {
+        "text": "Here's the forecast for Tokyo and the current weather in NYC:\n\n**Tokyo Forecast:**\n- Weather: Clear\n- Temperature: 16°C\n- Humidity: 77%\n- Wind speed: 19 km/h from the SW direction\n- Gust speed: 28 km/h\n\n**NYC Current Weather:**\n- Weather: Clear\n- Temperature: 4°C\n- Humidity: 26%\n- Wind speed: 15 km/h from the NNW direction\n\nWould you like any additional information about either city's weather?",
+        "generation_info": {
+          "model": "qwen3.5:9b",
+          "created_at": "2026-03-29T02:11:00.8938612Z",
+          "done": true,
+          "done_reason": "stop",
+          "total_duration": 225470722000,
+          "load_duration": 352764500,
+          "prompt_eval_count": 713,
+          "prompt_eval_duration": 96520353100,
+          "eval_count": 124,
+          "eval_duration": 128286528300,
+          "logprobs": null,
+          "model_name": "qwen3.5:9b",
+          "model_provider": "ollama"
+        },
+        "type": "ChatGeneration",
+        "message": {
+          "lc": 1,
+          "type": "constructor",
+          "id": [
+            "langchain",
+            "schema",
+            "messages",
+            "AIMessage"
+          ],
+          "kwargs": {
+            "content": "Here's the forecast for Tokyo and the current weather in NYC:\n\n**Tokyo Forecast:**\n- Weather: Clear\n- Temperature: 16°C\n- Humidity: 77%\n- Wind speed: 19 km/h from the SW direction\n- Gust speed: 28 km/h\n\n**NYC Current Weather:**\n- Weather: Clear\n- Temperature: 4°C\n- Humidity: 26%\n- Wind speed: 15 km/h from the NNW direction\n\nWould you like any additional information about either city's weather?",
+            "response_metadata": {
+              "model": "qwen3.5:9b",
+              "created_at": "2026-03-29T02:11:00.8938612Z",
+              "done": true,
+              "done_reason": "stop",
+              "total_duration": 225470722000,
+              "load_duration": 352764500,
+              "prompt_eval_count": 713,
+              "prompt_eval_duration": 96520353100,
+              "eval_count": 124,
+              "eval_duration": 128286528300,
+              "logprobs": null,
+              "model_name": "qwen3.5:9b",
+              "model_provider": "ollama"
+            },
+            "type": "ai",
+            "id": "lc_run--019d3758-6dd6-7e53-930f-d921f2edbecf-0",
+            "usage_metadata": {
+              "input_tokens": 713,
+              "output_tokens": 124,
+              "total_tokens": 837
+            },
+            "tool_calls": [],
+            "invalid_tool_calls": []
+          }
+        }
+      }
+    ]
+  ],
+  "llm_output": null,
+  "run": null,
+  "type": "LLMResult"
+}
+
+> Finished chain.
+[chain/end] [chain:LangGraph > chain:model] [225.50s] Exiting Chain run with output:
+[outputs]
+[updates] {'model': {'messages': [AIMessage(content="Here's the forecast for Tokyo and the current weather in NYC:\n\n**Tokyo Forecast:**\n- Weather: Clear\n- Temperature: 16°C\n- Humidity: 77%\n- Wind speed: 19 km/h from the SW direction\n- Gust speed: 28 km/h\n\n**NYC Current Weather:**\n- Weather: Clear\n- Temperature: 4°C\n- Humidity: 26%\n- Wind speed: 15 km/h from the NNW direction\n\nWould you like any additional information about either city's weather?", additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:11:00.8938612Z', 'done': True, 'done_reason': 'stop', 'total_duration': 225470722000, 'load_duration': 352764500, 'prompt_eval_count': 713, 'prompt_eval_duration': 96520353100, 'eval_count': 124, 'eval_duration': 128286528300, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3758-6dd6-7e53-930f-d921f2edbecf-0', tool_calls=[], invalid_tool_calls=[], usage_metadata={'input_tokens': 713, 'output_tokens': 124, 'total_tokens': 837})]}}
+2026-03-28 22:11:00,917 - mcp_use - DEBUG - 📦 Node 'model' output: {'messages': [AIMessage(content="Here's the forecast for Tokyo and the current weather in NYC:\n\n**Tokyo Forecast:**\n- Weather: Clear\n- Temperature: 16°C\n- Humidity: 77%\n- Wind speed: 19 km/h from the SW direction\n- Gust speed: 28 km/h\n\n**NYC Current Weather:**\n- Weather: Clear\n- Temperature: 4°C\n- Humidity: 26%\n- Wind speed: 15 km/h from the NNW direction\n\nWould you like any additional information about either city's weather?", additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:11:00.8938612Z', 'done': True, 'done_reason': 'stop', 'total_duration': 225470722000, 'load_duration': 352764500, 'prompt_eval_count': 713, 'prompt_eval_duration': 96520353100, 'eval_count': 124, 'eval_duration': 128286528300, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3758-6dd6-7e53-930f-d921f2edbecf-0', tool_calls=[], invalid_tool_calls=[], usage_metadata={'input_tokens': 713, 'output_tokens': 124, 'total_tokens': 837})]}
+2026-03-28 22:11:00,918 - mcp_use - INFO - ✅ Agent finished with output
+[values] {'messages': [HumanMessage(content='What is the weather in Tokyo?', additional_kwargs={}, response_metadata={}, id='7d44f262-dff9-4568-bb96-af5657c3e81b'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T01:56:17.0231047Z', 'done': True, 'done_reason': 'stop', 'total_duration': 333781839300, 'load_duration': 107571784500, 'prompt_eval_count': 393, 'prompt_eval_duration': 157621966800, 'eval_count': 73, 'eval_duration': 68091261400, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3749-490a-7f21-b25b-0e344f6ec771-0', tool_calls=[{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 393, 'output_tokens': 73, 'total_tokens': 466}), ToolMessage(content='The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.', name='get_weather', id='c0d5cb86-f8ff-4853-825e-d4f6be8bd6f4', tool_call_id='edf4a68f-0490-4e29-9e2e-4bb2d512227b'), AIMessage(content='The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:01:08.8649771Z', 'done': True, 'done_reason': 'stop', 'total_duration': 289220280000, 'load_duration': 480521100, 'prompt_eval_count': 474, 'prompt_eval_duration': 196063728400, 'eval_count': 96, 'eval_duration': 92476251800, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d374e-6c2b-7933-9629-0609a3ce4374-0', tool_calls=[], invalid_tool_calls=[], usage_metadata={'input_tokens': 474, 'output_tokens': 96, 'total_tokens': 570}), HumanMessage(content='What is the forecast for Tokyo? And what is the weather in NYC?', additional_kwargs={}, response_metadata={}, id='3466c77a-7ba1-48cc-8cf3-f8700d068aea'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:07:12.3665018Z', 'done': True, 'done_reason': 'stop', 'total_duration': 362403527400, 'load_duration': 380420400, 'prompt_eval_count': 558, 'prompt_eval_duration': 242185354900, 'eval_count': 124, 'eval_duration': 119596386200, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3752-da43-75a2-a730-f97b9fb6fb79-0', tool_calls=[{'name': 'get_forecast', 'args': {'city': 'Tokyo'}, 'id': '12d61640-4b62-43a8-8557-228a4574b7f4', 'type': 'tool_call'}, {'name': 'get_weather', 'args': {'city': 'NYC'}, 'id': '0e03e7b9-bc55-4160-b1cb-41d25dc25c46', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 558, 'output_tokens': 124, 'total_tokens': 682}), ToolMessage(content='The forecast for Tokyo is Clear  with a temperature of 16°C, humidity of 77%, wind speed of 19 km/h from the SW direction and gust speed of 28 km/h.', name='get_forecast', id='53d92700-a038-4cc7-b6c6-a8d80d3d97cb', tool_call_id='12d61640-4b62-43a8-8557-228a4574b7f4'), ToolMessage(content='The weather in NYC is Clear with a temperature of 4°C, humidity of 26%, wind speed of 15 km/h from the NNW direction.', name='get_weather', id='49199192-f50f-4272-a82b-9f290526405a', tool_call_id='0e03e7b9-bc55-4160-b1cb-41d25dc25c46'), AIMessage(content="Here's the forecast for Tokyo and the current weather in NYC:\n\n**Tokyo Forecast:**\n- Weather: Clear\n- Temperature: 16°C\n- Humidity: 77%\n- Wind speed: 19 km/h from the SW direction\n- Gust speed: 28 km/h\n\n**NYC Current Weather:**\n- Weather: Clear\n- Temperature: 4°C\n- Humidity: 26%\n- Wind speed: 15 km/h from the NNW direction\n\nWould you like any additional information about either city's weather?", additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:11:00.8938612Z', 'done': True, 'done_reason': 'stop', 'total_duration': 225470722000, 'load_duration': 352764500, 'prompt_eval_count': 713, 'prompt_eval_duration': 96520353100, 'eval_count': 124, 'eval_duration': 128286528300, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3758-6dd6-7e53-930f-d921f2edbecf-0', tool_calls=[], invalid_tool_calls=[], usage_metadata={'input_tokens': 713, 'output_tokens': 124, 'total_tokens': 837})], 'thread_model_call_count': 1, 'run_model_call_count': 1}
+
+
+> Entering new ModelCallLimitMiddleware.after_model chain...
+[chain/start] [chain:LangGraph > chain:ModelCallLimitMiddleware.after_model] Entering Chain run with input:
+[inputs]
+
+> Finished chain.
+[chain/end] [chain:LangGraph > chain:ModelCallLimitMiddleware.after_model] [8ms] Exiting Chain run with output:
+{
+  "thread_model_call_count": 2,
+  "run_model_call_count": 2
+}
+[updates] {'ModelCallLimitMiddleware.after_model': {'thread_model_call_count': 2, 'run_model_call_count': 2}}
+2026-03-28 22:11:00,937 - mcp_use - DEBUG - 📦 Node 'ModelCallLimitMiddleware.after_model' output: {'thread_model_call_count': 2, 'run_model_call_count': 2}
+[values] {'messages': [HumanMessage(content='What is the weather in Tokyo?', additional_kwargs={}, response_metadata={}, id='7d44f262-dff9-4568-bb96-af5657c3e81b'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T01:56:17.0231047Z', 'done': True, 'done_reason': 'stop', 'total_duration': 333781839300, 'load_duration': 107571784500, 'prompt_eval_count': 393, 'prompt_eval_duration': 157621966800, 'eval_count': 73, 'eval_duration': 68091261400, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3749-490a-7f21-b25b-0e344f6ec771-0', tool_calls=[{'name': 'get_weather', 'args': {'city': 'Tokyo'}, 'id': 'edf4a68f-0490-4e29-9e2e-4bb2d512227b', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 393, 'output_tokens': 73, 'total_tokens': 466}), ToolMessage(content='The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.', name='get_weather', id='c0d5cb86-f8ff-4853-825e-d4f6be8bd6f4', tool_call_id='edf4a68f-0490-4e29-9e2e-4bb2d512227b'), AIMessage(content='The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:01:08.8649771Z', 'done': True, 'done_reason': 'stop', 'total_duration': 289220280000, 'load_duration': 480521100, 'prompt_eval_count': 474, 'prompt_eval_duration': 196063728400, 'eval_count': 96, 'eval_duration': 92476251800, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d374e-6c2b-7933-9629-0609a3ce4374-0', tool_calls=[], invalid_tool_calls=[], usage_metadata={'input_tokens': 474, 'output_tokens': 96, 'total_tokens': 570}), HumanMessage(content='What is the forecast for Tokyo? And what is the weather in NYC?', additional_kwargs={}, response_metadata={}, id='3466c77a-7ba1-48cc-8cf3-f8700d068aea'), AIMessage(content='', additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:07:12.3665018Z', 'done': True, 'done_reason': 'stop', 'total_duration': 362403527400, 'load_duration': 380420400, 'prompt_eval_count': 558, 'prompt_eval_duration': 242185354900, 'eval_count': 124, 'eval_duration': 119596386200, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3752-da43-75a2-a730-f97b9fb6fb79-0', tool_calls=[{'name': 'get_forecast', 'args': {'city': 'Tokyo'}, 'id': '12d61640-4b62-43a8-8557-228a4574b7f4', 'type': 'tool_call'}, {'name': 'get_weather', 'args': {'city': 'NYC'}, 'id': '0e03e7b9-bc55-4160-b1cb-41d25dc25c46', 'type': 'tool_call'}], invalid_tool_calls=[], usage_metadata={'input_tokens': 558, 'output_tokens': 124, 'total_tokens': 682}), ToolMessage(content='The forecast for Tokyo is Clear  with a temperature of 16°C, humidity of 77%, wind speed of 19 km/h from the SW direction and gust speed of 28 km/h.', name='get_forecast', id='53d92700-a038-4cc7-b6c6-a8d80d3d97cb', tool_call_id='12d61640-4b62-43a8-8557-228a4574b7f4'), ToolMessage(content='The weather in NYC is Clear with a temperature of 4°C, humidity of 26%, wind speed of 15 km/h from the NNW direction.', name='get_weather', id='49199192-f50f-4272-a82b-9f290526405a', tool_call_id='0e03e7b9-bc55-4160-b1cb-41d25dc25c46'), AIMessage(content="Here's the forecast for Tokyo and the current weather in NYC:\n\n**Tokyo Forecast:**\n- Weather: Clear\n- Temperature: 16°C\n- Humidity: 77%\n- Wind speed: 19 km/h from the SW direction\n- Gust speed: 28 km/h\n\n**NYC Current Weather:**\n- Weather: Clear\n- Temperature: 4°C\n- Humidity: 26%\n- Wind speed: 15 km/h from the NNW direction\n\nWould you like any additional information about either city's weather?", additional_kwargs={}, response_metadata={'model': 'qwen3.5:9b', 'created_at': '2026-03-29T02:11:00.8938612Z', 'done': True, 'done_reason': 'stop', 'total_duration': 225470722000, 'load_duration': 352764500, 'prompt_eval_count': 713, 'prompt_eval_duration': 96520353100, 'eval_count': 124, 'eval_duration': 128286528300, 'logprobs': None, 'model_name': 'qwen3.5:9b', 'model_provider': 'ollama'}, id='lc_run--019d3758-6dd6-7e53-930f-d921f2edbecf-0', tool_calls=[], invalid_tool_calls=[], usage_metadata={'input_tokens': 713, 'output_tokens': 124, 'total_tokens': 837})], 'thread_model_call_count': 2, 'run_model_call_count': 2}
+
+> Finished chain.
+[chain/end] [chain:LangGraph] [591.02s] Exiting Chain run with output:
+[outputs]
+2026-03-28 22:11:00,951 - mcp_use - INFO - 🎉 Agent execution complete in 591.04 seconds
+Here's the forecast for Tokyo and the current weather in NYC:
+
+**Tokyo Forecast:**
+- Weather: Clear
+- Temperature: 16°C
+- Humidity: 77%
+- Wind speed: 19 km/h from the SW direction
+- Gust speed: 28 km/h
+
+**NYC Current Weather:**
+- Weather: Clear
+- Temperature: 4°C
+- Humidity: 26%
+- Wind speed: 15 km/h from the NNW direction
+
+Would you like any additional information about either city's weather?
+
+--- Context after second turn ---
+System message:
+You are a helpful AI assistant.
+You have access to the following tools:
+
+- get_weather: Get the weather for a given city.
+- get_forecast: Get the forecast for a given city.
+
+Use these tools to help answer questions and complete tasks as needed.
+Conversation history: 9 message(s)
+  [0] HumanMessage: 'What is the weather in Tokyo?'
+  [1] AIMessage: ''
+  [2] ToolMessage: 'The weather in Tokyo is Patchy rain nearby with a temperature of 17°C, humidity of 77%, wind speed of 22 km/h from the SW direction.'
+  [3] AIMessage: 'The weather in Tokyo is currently showing patchy rain nearby. Here are the current conditions:\n\n- Temperature: 17°C\n- Humidity: 77%\n- Wind speed: 22 km/h from the SW direction\n\nWould you like me to get a forecast for Tokyo as well?'
+  [4] HumanMessage: 'What is the forecast for Tokyo? And what is the weather in NYC?'
+  [5] AIMessage: ''
+  [6] ToolMessage: 'The forecast for Tokyo is Clear  with a temperature of 16°C, humidity of 77%, wind speed of 19 km/h from the SW direction and gust speed of 28 km/h.'
+  [7] ToolMessage: 'The weather in NYC is Clear with a temperature of 4°C, humidity of 26%, wind speed of 15 km/h from the NNW direction.'
+  [8] AIMessage: "Here's the forecast for Tokyo and the current weather in NYC:\n\n**Tokyo Forecast:**\n- Weather: Clear\n- Temperature: 16°C\n- Humidity: 77%\n- Wind speed: 19 km/h from the SW direction\n- Gust speed: 28 km/h\n\n**NYC Current Weather:**\n- Weather: Clear\n- Temperature: 4°C\n- Humidity: 26%\n- Wind speed: 15 km/h from the NNW direction\n\nWould you like any additional information about either city's weather?"
+2026-03-28 22:11:02,000 - mcp_use - DEBUG - StdioConnectionManager task cancelled during stop
+C:\sources\georgejinu-labs\mcp-weather-app-local-agent>
