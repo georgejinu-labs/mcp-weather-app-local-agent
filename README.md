@@ -2,7 +2,7 @@
 
 Sample project: a **FastMCP** weather server (tools backed by [wttr.in](https://wttr.in)), a **stdio** MCP subprocess, and a **LangChain** agent via **mcp-use** with **Ollama** (`langchain-ollama`).
 
-**HTML version:** `[README.html](README.html)` is a standalone export of this documentation. Use it when your Markdown preview does not render Mermaid or you want a single file to open in a browser. After cloning, open `README.html` from disk (double-click or drag into a browser). On GitHub, open `[README.html](README.html)` from the file tree (the web UI may show source or preview depending on the page).
+**HTML version:** [README.html](./README.html) is a standalone export of this documentation. Use it when your Markdown preview does not render Mermaid or you want a single file to open in a browser. After cloning, open that file from disk (double-click or drag into a browser). On GitHub, browse to [README.html](./README.html) in the file tree (the web UI may show source or preview depending on the page).
 
 ---
 
@@ -34,7 +34,7 @@ These are the pieces you see wired together in a trace such as `execution.log` (
 
 The log sequence is: **connect MCP → discover tools → build agent → for each user message, run the graph** (model ↔ tools ↔ MCP until the model answers without tools).
 
-**Viewing diagrams:** Fenced blocks marked `mermaid` render as graphics on **github.com** (and in editors with a Mermaid preview). In plain Markdown previews they often look like an unreadable code block — use the **ASCII** diagrams in that case, open `**[README.html`**.
+**Viewing diagrams:** Fenced blocks marked `mermaid` render as graphics on **github.com** (and in editors with a Mermaid preview). In plain Markdown previews they often look like an unreadable code block — use the **ASCII** diagrams in that case, open [README.html](./README.html)
 
 ### High-level ASCII
 
