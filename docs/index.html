@@ -219,7 +219,7 @@
 </head>
 <body>
 
-<p class="published-banner"><strong>Published URL:</strong> <a href="https://georgejinu-labs.github.io/mcp-weather-app-local-agent/">https://georgejinu-labs.github.io/mcp-weather-app-local-agent/</a> · <strong>Source:</strong> <code>docs/index.html</code> in the <a href="https://github.com/georgejinu-labs/mcp-weather-app-local-agent">repository</a></p>
+<p class="published-banner"><strong>Published URL:</strong> <a href="https://georgejinu-labs.github.io/mcp-weather-app-local-agent/">https://georgejinu-labs.github.io/mcp-weather-app-local-agent/</a> · <strong>Source:</strong> <code>docs/index.html</code> in the <a href="https://github.com/georgejinu-labs/mcp-weather-app-local-agent">GitHub repository</a></p>
 
 <h1>Weather MCP Agent — Under the Hood</h1>
 <p class="subtitle">A phase-by-phase walkthrough of every log line — mapped to the component that produced it.</p>
@@ -244,6 +244,10 @@
   <a href="#loop">The Full Loop</a>
   <a href="#memory">memory_enabled=True</a>
   <a href="#summary">Component Summary</a>
+  <a href="#tokens">Context Window &amp; Tokens</a>
+  <a href="#maxsteps">max_steps=15</a>
+  <a href="#memory">memory_enabled — deep dive</a>
+  <a href="#langchain-langgraph">LangChain and LangGraph</a>
 </div>
 
 <!-- ===== PHASE 0 ===== -->
@@ -530,7 +534,7 @@ Think of it like a whiteboard with limited space:
   │  <span class="hl-t">[Turn 1 AI tool call]</span>         ~50  tokens      │
   │  <span class="hl-b">[Tool result injected]</span>        ~81  tokens      │
   │  <span class="hl-t">[Turn 1 AI final answer]</span>      ~96  tokens      │
-  │  <span class="hl-a">[Your new question]</span>           ~10  tokens      │
+  │  <span class="hl-a">[Your new question]</span>           ~10  tokens  ← just added │
   └─────────────────────────────────────────────────┘
   Total used: ~557 tokens. Still 32,211 tokens of room.</pre>
 </div>
@@ -628,6 +632,140 @@ With Claude API in prod → small cost, very predictable.</span>
   </table>
 </div>
 
+<div class="phase-card" style="border-color:#9FE1CB">
+  <div class="phase-bar" style="background:#085041;color:#9FE1CB">What this means for your PA automation agent</div>
+<pre>
+Each PA request loop might consume approximately:
+
+  System prompt + tool list:     ~500  tokens
+  PA request data:               ~300  tokens
+  Eligibility API result:        ~200  tokens
+  Clinical guidelines result:    ~500  tokens
+  PA DB query result:            ~300  tokens
+  Previous decisions context:    ~200  tokens
+  ──────────────────────────────────────────
+  Total per PA:                  ~2000 tokens  (input)
+
+<span class="hl-g">qwen3.5:9b  (32K limit):  handles ~15 PAs per session safely</span>
+<span class="hl-a">Claude API  (200K limit): handles ~100 PAs comfortably</span>
+
+<span class="hl-gr">Recommended strategy for the POC:
+  1. Process each PA as a fresh agent.run() call
+  2. Store PA decisions in DynamoDB (external memory)
+  3. Don't carry all PA history in context — just the current one
+  4. Summarize tool results before injecting (trim large API payloads)
+  5. Upgrade to Claude API for prod where 200K window removes the constraint</span></pre>
+</div>
+
+
+<!-- ===== MAX STEPS ===== -->
+<h2 id="maxsteps" style="margin-top:32px">max_steps=15 — The safety brake on the loop</h2>
+
+<div class="phase-card">
+  <div class="phase-bar" style="background:#2C2C2A;color:#D3D1C7">What is one "step"?</div>
+  <p style="font-size:13px;color:#c8c6be;line-height:1.7;margin-bottom:10px">
+    One step = one full loop iteration: LLM thinks &rarr; (optionally calls a tool) &rarr; result fed back. Without a limit, a confused LLM could loop forever. <code>max_steps</code> is the hard brake.
+  </p>
+<pre>
+Your trace had 2 steps for "What is the weather in Tokyo?":
+
+Step 1:  <span class="hl-p">LLM Call #1</span>  &rarr; decided to call get_weather
+         <span class="hl-t">Tool call</span>     &rarr; get_weather(city=Tokyo) &rarr; got result
+         <span class="hl-g">ModelCallLimitMiddleware: run_model_call_count = 1</span>
+
+Step 2:  <span class="hl-p">LLM Call #2</span>  &rarr; read result, wrote final answer
+         <span class="hl-g">ModelCallLimitMiddleware: run_model_call_count = 2</span>
+         <span class="hl-gr">tool_calls=[] &rarr; DONE. Exited loop. Used 2 of 15 steps.</span></pre>
+</div>
+
+<div class="phase-card">
+  <div class="phase-bar" style="background:#2C2C2A;color:#D3D1C7">Normal exit vs max_steps hit</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
+
+    <div>
+      <div style="font-size:11px;font-weight:600;color:#5DCAA5;margin-bottom:8px">Normal exit — LLM finishes early</div>
+      <div style="background:#181818;border-radius:8px;padding:12px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="width:22px;height:22px;border-radius:50%;background:#E1F5EE;color:#085041;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">1</span>
+          <span style="font-size:12px;font-family:monospace;background:#E1F5EE;color:#085041;padding:4px 10px;border-radius:5px;flex:1">call tool A &rarr; result</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="width:22px;height:22px;border-radius:50%;background:#E1F5EE;color:#085041;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">2</span>
+          <span style="font-size:12px;font-family:monospace;background:#E1F5EE;color:#085041;padding:4px 10px;border-radius:5px;flex:1">call tool B &rarr; result</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="width:22px;height:22px;border-radius:50%;background:#E1F5EE;color:#085041;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">3</span>
+          <span style="font-size:12px;font-family:monospace;background:#E1F5EE;color:#085041;padding:4px 10px;border-radius:5px;flex:1">final answer &#10003; DONE</span>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#5DCAA5;margin-top:6px">tool_calls=[] &rarr; loop exits cleanly. Full answer returned.</div>
+    </div>
+
+    <div>
+      <div style="font-size:11px;font-weight:600;color:#F09595;margin-bottom:8px">max_steps hit — forced stop</div>
+      <div style="background:#181818;border-radius:8px;padding:12px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="width:22px;height:22px;border-radius:50%;background:#FCEBEB;color:#A32D2D;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">1</span>
+          <span style="font-size:12px;font-family:monospace;background:#FCEBEB;color:#A32D2D;padding:4px 10px;border-radius:5px;flex:1">call tool A &rarr; error, retrying...</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="width:22px;height:22px;border-radius:50%;background:#FCEBEB;color:#A32D2D;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">2</span>
+          <span style="font-size:12px;font-family:monospace;background:#FCEBEB;color:#A32D2D;padding:4px 10px;border-radius:5px;flex:1">call tool A &rarr; error, retrying...</span>
+        </div>
+        <div style="text-align:center;font-size:11px;color:#666460;padding:2px 0">&middot; &middot; &middot; keeps looping &middot; &middot; &middot;</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+          <span style="width:22px;height:22px;border-radius:50%;background:#A32D2D;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">15</span>
+          <span style="font-size:12px;font-family:monospace;background:#A32D2D;color:#fff;padding:4px 10px;border-radius:5px;flex:1">HARD STOP &#10007;</span>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#F09595;margin-top:6px">StopIteration raised. Returns partial result or empty string.</div>
+    </div>
+  </div>
+</div>
+
+<div class="phase-card" style="border-color:#FAC775">
+  <div class="phase-bar" style="background:#633806;color:#FAC775">What causes an agent to hit max_steps</div>
+<pre>
+<span class="hl-r">1. Tool keeps failing &rarr; LLM keeps retrying</span>
+   get_weather &rarr; timeout &rarr; retry &rarr; timeout &rarr; retry...
+
+<span class="hl-r">2. LLM gets confused in a loop</span>
+   calls tool A &rarr; gets result &rarr; calls tool A again (same params!)
+
+<span class="hl-r">3. Task genuinely needs more steps than you allowed</span>
+   PA agent processing 5 requests but max_steps=10
+   &rarr; runs out before finishing all 5
+
+<span class="hl-r">4. LLM over-planning</span>
+   breaks a simple task into 20 tiny tool calls when 5 suffice</pre>
+</div>
+
+<div class="phase-card" style="border-color:#9FE1CB">
+  <div class="phase-bar" style="background:#085041;color:#9FE1CB">Recommended max_steps for your PA agent + how to handle the hit</div>
+<pre>
+PA agent steps per request:
+  Step 1: query PA database           &rarr; pending request data
+  Step 2: check member eligibility    &rarr; eligibility API
+  Step 3: search clinical guidelines  &rarr; guidelines DB
+  Step 4: evaluate criteria           &rarr; LLM reasons (no tool call)
+  Step 5: update PA status in DB      &rarr; write result
+  Step 6: generate approval letter    &rarr; document tool
+  Step 7: send notification           &rarr; fax/email tool
+  Step 8: LLM writes final summary    &rarr; DONE
+
+<span class="hl-gr">max_steps=15 gives buffer above the ~8 steps needed.
+Too low (e.g. 5)    &rarr; agent stops mid-workflow.</span>
+<span class="hl-r">Too high (e.g. 1000) &rarr; stuck agent burns tokens forever.</span>
+
+Handle it in your code (Week 4 human-in-loop gate):
+try:
+    response = await agent.run(f"Process PA request {pa_id}")
+    if not response or len(response.strip()) &lt; 20:
+        await flag_for_human_review(pa_id, reason="agent_incomplete")
+except Exception as e:
+    await flag_for_human_review(pa_id, reason=str(e))</pre>
+</div>
+
 <!-- ===== MEMORY ENABLED ===== -->
 <h2 id="memory" style="margin-top:32px">memory_enabled=True — What it actually means</h2>
 
@@ -646,82 +784,97 @@ With Claude API in prod → small cost, very predictable.</span>
 </div>
 
 <div class="phase-card">
-  <div class="phase-bar" style="background:#3C3489;color:#CECBF6">What exactly is in the messages list — all 4 types</div>
-<pre>
-messages = [
-
-  <span class="hl-b">SystemMessage</span>    <span class="hl-gr">✓ always included</span>   <span class="hl-g">← system prompt + tool list (rebuilt fresh each call)</span>
-
-  <span class="hl-g">  ── everything below is the "memory" that grows ──</span>
-
-  <span class="hl-p">HumanMessage</span>     <span class="hl-gr">✓ carried forward</span>   <span class="hl-g">← your previous questions</span>
-  <span class="hl-p">AIMessage</span>        <span class="hl-gr">✓ carried forward</span>   <span class="hl-g">← LLM's tool call JSONs</span>
-  <span class="hl-t">ToolMessage</span>      <span class="hl-gr">✓ carried forward</span>   <span class="hl-g">← tool results injected back</span>
-  <span class="hl-p">AIMessage</span>        <span class="hl-gr">✓ carried forward</span>   <span class="hl-g">← LLM's final text answers</span>
-
-]
-
-<span class="hl-g">YES — all 4 message types accumulate and get passed on every agent.run() call.</span></pre>
+  <div class="phase-bar" style="background:#3C3489;color:#CECBF6">All 4 message types that get carried forward</div>
+  <div style="background:#181818;border-radius:8px;padding:14px;margin-top:4px">
+    <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:10px">
+      <span style="font-size:10px;font-weight:700;background:#E6F1FB;color:#0C447C;border-radius:3px;padding:2px 8px;flex-shrink:0;margin-top:1px">SYSTEM</span>
+      <span style="font-size:12px;font-family:monospace;color:#888780">You are a helpful AI assistant. Tools: get_weather, get_forecast...</span>
+      <span style="font-size:10px;color:#3B6D11;margin-left:auto;white-space:nowrap">&#10003; always included (rebuilt fresh)</span>
+    </div>
+    <div style="border-left:2px solid #333;padding-left:12px;margin-left:4px">
+      <div style="font-size:10px;color:#666460;margin-bottom:8px">&#8592; everything below is the "memory" that grows with memory_enabled=True</div>
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">
+        <span style="font-size:10px;font-weight:700;background:#D3D1C7;color:#2C2C2A;border-radius:3px;padding:2px 8px;flex-shrink:0;margin-top:1px">HUMAN</span>
+        <span style="font-size:12px;font-family:monospace;color:#c8c6be">What is the weather in Tokyo?</span>
+        <span style="font-size:10px;color:#3B6D11;margin-left:auto;white-space:nowrap">&#10003; carried forward</span>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">
+        <span style="font-size:10px;font-weight:700;background:#CECBF6;color:#26215C;border-radius:3px;padding:2px 8px;flex-shrink:0;margin-top:1px">AI</span>
+        <span style="font-size:12px;font-family:monospace;color:#c8c6be">[tool_call: get_weather(city=Tokyo)]</span>
+        <span style="font-size:10px;color:#3B6D11;margin-left:auto;white-space:nowrap">&#10003; carried forward</span>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">
+        <span style="font-size:10px;font-weight:700;background:#9FE1CB;color:#04342C;border-radius:3px;padding:2px 8px;flex-shrink:0;margin-top:1px">TOOL</span>
+        <span style="font-size:12px;font-family:monospace;color:#c8c6be">The weather in Tokyo is Patchy rain, 17&deg;C, humidity 77%...</span>
+        <span style="font-size:10px;color:#3B6D11;margin-left:auto;white-space:nowrap">&#10003; carried forward</span>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:8px">
+        <span style="font-size:10px;font-weight:700;background:#CECBF6;color:#26215C;border-radius:3px;padding:2px 8px;flex-shrink:0;margin-top:1px">AI</span>
+        <span style="font-size:12px;font-family:monospace;color:#c8c6be">The weather in Tokyo is patchy rain, 17&deg;C... Would you like a forecast?</span>
+        <span style="font-size:10px;color:#3B6D11;margin-left:auto;white-space:nowrap">&#10003; carried forward</span>
+      </div>
+    </div>
+    <div style="text-align:right;font-size:10px;color:#666460;margin-top:10px">total context: ~570 tokens</div>
+  </div>
 </div>
 
 <div class="phase-card">
-  <div class="phase-bar" style="background:#3C3489;color:#CECBF6">Side by side — 2nd agent.run() with and without memory</div>
-
+  <div class="phase-bar" style="background:#3C3489;color:#CECBF6">agent.run("What is the forecast?") — memory=False vs memory=True</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
 
     <div>
       <div style="font-size:11px;font-weight:600;color:#F09595;margin-bottom:8px">memory=False — 2nd call context</div>
-      <div style="border-radius:8px;background:#181818;padding:10px">
-        <div style="display:flex;gap:6px;margin-bottom:5px;align-items:flex-start">
-          <span style="font-size:10px;font-weight:700;background:#E6F1FB;color:#0C447C;border-radius:3px;padding:1px 6px;flex-shrink:0">SYSTEM</span>
-          <span style="font-size:11px;font-family:monospace;color:#888780">tools: get_weather, get_forecast...</span>
+      <div style="background:#181818;border-radius:8px;padding:12px">
+        <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">
+          <span style="font-size:10px;font-weight:700;background:#E6F1FB;color:#0C447C;border-radius:3px;padding:2px 7px;flex-shrink:0">SYSTEM</span>
+          <span style="font-size:11px;font-family:monospace;color:#888780">You are a helpful AI assistant. Tools: get_weather, get_forecast...</span>
         </div>
-        <div style="display:flex;gap:6px;align-items:flex-start">
-          <span style="font-size:10px;font-weight:700;background:#FAC775;color:#633806;border-radius:3px;padding:1px 6px;flex-shrink:0">HUMAN</span>
+        <div style="display:flex;align-items:flex-start;gap:8px">
+          <span style="font-size:10px;font-weight:700;background:#FAC775;color:#633806;border-radius:3px;padding:2px 7px;flex-shrink:0">HUMAN</span>
           <span style="font-size:11px;font-family:monospace;color:#c8c6be">What is the forecast?</span>
         </div>
       </div>
-      <div style="margin-top:8px;padding:8px;background:#1a0808;border-radius:6px;border:1px solid #F09595;font-size:11px;color:#F09595">
-        LLM has no idea "forecast" means Tokyo — never told. Will ask "forecast for where?" or guess wrong.
+      <div style="margin-top:8px;padding:10px;background:#1a0808;border-radius:6px;border:1px solid #F09595;font-size:12px;color:#F09595;line-height:1.6">
+        LLM sees only this. Has no idea "forecast" means Tokyo — it was never told. Will likely ask "forecast for where?" or guess wrong.
       </div>
-      <div style="font-size:10px;color:#666460;margin-top:4px;text-align:right">~320 tokens</div>
+      <div style="font-size:10px;color:#666460;margin-top:6px;text-align:right">total context: ~320 tokens</div>
     </div>
 
     <div>
       <div style="font-size:11px;font-weight:600;color:#5DCAA5;margin-bottom:8px">memory=True — 2nd call context</div>
-      <div style="border-radius:8px;background:#181818;padding:10px">
-        <div style="display:flex;gap:6px;margin-bottom:5px;align-items:flex-start">
-          <span style="font-size:10px;font-weight:700;background:#E6F1FB;color:#0C447C;border-radius:3px;padding:1px 6px;flex-shrink:0">SYSTEM</span>
-          <span style="font-size:11px;font-family:monospace;color:#888780">tools: get_weather, get_forecast...</span>
+      <div style="background:#181818;border-radius:8px;padding:12px">
+        <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">
+          <span style="font-size:10px;font-weight:700;background:#E6F1FB;color:#0C447C;border-radius:3px;padding:2px 7px;flex-shrink:0">SYSTEM</span>
+          <span style="font-size:11px;font-family:monospace;color:#888780">You are a helpful AI assistant. Tools: get_weather, get_forecast...</span>
         </div>
-        <div style="border-left:2px solid #333;padding-left:8px;margin:6px 0;opacity:0.75">
-          <div style="font-size:9px;color:#666460;margin-bottom:4px">← carried from previous agent.run()</div>
-          <div style="display:flex;gap:6px;margin-bottom:4px;align-items:flex-start">
-            <span style="font-size:10px;font-weight:700;background:#F1EFE8;color:#444441;border-radius:3px;padding:1px 6px;flex-shrink:0">HUMAN</span>
+        <div style="border-left:2px solid #333;padding-left:8px;margin:8px 0">
+          <div style="font-size:9px;color:#666460;margin-bottom:6px">&#8592; carried forward from previous agent.run()</div>
+          <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px">
+            <span style="font-size:10px;font-weight:700;background:#D3D1C7;color:#2C2C2A;border-radius:3px;padding:1px 6px;flex-shrink:0">HUMAN</span>
             <span style="font-size:11px;font-family:monospace;color:#888780">What is the weather in Tokyo?</span>
           </div>
-          <div style="display:flex;gap:6px;margin-bottom:4px;align-items:flex-start">
-            <span style="font-size:10px;font-weight:700;background:#EEEDFE;color:#3C3489;border-radius:3px;padding:1px 6px;flex-shrink:0">AI</span>
+          <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px">
+            <span style="font-size:10px;font-weight:700;background:#CECBF6;color:#26215C;border-radius:3px;padding:1px 6px;flex-shrink:0">AI</span>
             <span style="font-size:11px;font-family:monospace;color:#888780">[tool_call: get_weather(city=Tokyo)]</span>
           </div>
-          <div style="display:flex;gap:6px;margin-bottom:4px;align-items:flex-start">
-            <span style="font-size:10px;font-weight:700;background:#E1F5EE;color:#085041;border-radius:3px;padding:1px 6px;flex-shrink:0">TOOL</span>
-            <span style="font-size:11px;font-family:monospace;color:#888780">Patchy rain, 17°C, humidity 77%...</span>
+          <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px">
+            <span style="font-size:10px;font-weight:700;background:#9FE1CB;color:#04342C;border-radius:3px;padding:1px 6px;flex-shrink:0">TOOL</span>
+            <span style="font-size:11px;font-family:monospace;color:#888780">Patchy rain, 17&deg;C, humidity 77%...</span>
           </div>
-          <div style="display:flex;gap:6px;align-items:flex-start">
-            <span style="font-size:10px;font-weight:700;background:#EEEDFE;color:#3C3489;border-radius:3px;padding:1px 6px;flex-shrink:0">AI</span>
-            <span style="font-size:11px;font-family:monospace;color:#888780">The weather in Tokyo is 17°C...</span>
+          <div style="display:flex;align-items:flex-start;gap:6px">
+            <span style="font-size:10px;font-weight:700;background:#CECBF6;color:#26215C;border-radius:3px;padding:1px 6px;flex-shrink:0">AI</span>
+            <span style="font-size:11px;font-family:monospace;color:#888780">The weather in Tokyo is patchy rain, 17&deg;C...</span>
           </div>
         </div>
-        <div style="display:flex;gap:6px;align-items:flex-start">
-          <span style="font-size:10px;font-weight:700;background:#FAC775;color:#633806;border-radius:3px;padding:1px 6px;flex-shrink:0">HUMAN</span>
+        <div style="display:flex;align-items:flex-start;gap:8px">
+          <span style="font-size:10px;font-weight:700;background:#FAC775;color:#633806;border-radius:3px;padding:2px 7px;flex-shrink:0">HUMAN</span>
           <span style="font-size:11px;font-family:monospace;color:#c8c6be">What is the forecast?</span>
         </div>
       </div>
-      <div style="margin-top:8px;padding:8px;background:#0a1a0e;border-radius:6px;border:1px solid #5DCAA5;font-size:11px;color:#5DCAA5">
-        LLM sees everything. Knows "forecast" means Tokyo. Calls get_forecast(city=Tokyo) without asking.
+      <div style="margin-top:8px;padding:10px;background:#0a1a0e;border-radius:6px;border:1px solid #5DCAA5;font-size:12px;color:#5DCAA5;line-height:1.6">
+        LLM sees everything. Knows "forecast" means Tokyo. Calls get_forecast(city=Tokyo) without needing to ask.
       </div>
-      <div style="font-size:10px;color:#666460;margin-top:4px;text-align:right">~890 tokens (+570 from history)</div>
+      <div style="font-size:10px;color:#666460;margin-top:6px;text-align:right">total context: ~890 tokens (+320 from history)</div>
     </div>
 
   </div>
@@ -740,7 +893,167 @@ agent.run() call 4:  ~1500 tokens in context  (+300)
 <span class="hl-g">memory=True is great for SHORT multi-turn conversations.
 For LONG sessions (like processing 50 PA requests), don't use it blindly.</span>
 
-</pre>
+<span class="hl-gr">Better pattern for your PA agent:
+  memory_enabled=False  ← each PA is self-contained
+  + save decisions to DynamoDB after each call
+  + only inject RELEVANT past context per PA, not everything</span></pre>
+</div>
+
+
+<!-- ===== LANGCHAIN AND LANGGRAPH ===== -->
+<h2 id="langchain-langgraph" style="margin-top:32px">LangChain and LangGraph — where they fit</h2>
+
+<div class="phase-card">
+  <div class="phase-bar" style="background:#2C2C2A;color:#D3D1C7">Your understanding — confirmed and sharpened</div>
+<pre>
+<span class="hl-gr">&#10003; CORRECT:</span> "LangChain is a framework for common message formats
+               (System, Human, AI, Tool messages)"
+
+<span class="hl-gr">&#10003; CORRECT:</span> "LangGraph is the loop"
+
+<span class="hl-a">&#8594; ADD THIS:</span> Nodes belong to LangGraph — they ARE the loop.
+               LangGraph = loop engine + nodes + edges.
+               A node IS a named step in the loop. Not a separate thing.
+
+<span class="hl-g">Where do nodes live?
+  Not in LangChain.   LangChain has no concept of nodes.
+  Not in the LLM.     The LLM has zero awareness of nodes.
+  Only in LangGraph.  Nodes are a LangGraph concept, full stop.</span></pre>
+</div>
+
+<div class="phase-card">
+  <div class="phase-bar" style="background:#3C3489;color:#CECBF6">Each library owns exactly one concern</div>
+
+  <div style="border-radius:8px;padding:12px 16px;background:#1a1a2e;border:1px solid #534AB7;margin-bottom:8px">
+    <div style="font-size:13px;font-weight:600;color:#9F9BE8;margin-bottom:6px">LangChain <span style="font-size:10px;font-weight:600;background:#534AB7;color:#EEEDFE;border-radius:4px;padding:2px 8px;margin-left:6px">message formats + interfaces</span></div>
+    <div style="font-size:12px;color:#CECBF6;line-height:1.8">
+      Owns: <code>SystemMessage</code>, <code>HumanMessage</code>, <code>AIMessage</code>, <code>ToolMessage</code><br>
+      Owns: <code>StructuredTool</code> — the format mcp-use converts MCP tools into<br>
+      Owns: the standard <code>.invoke(messages)</code> interface every LLM adapter uses<br>
+      Does NOT own: nodes, edges, loops, graphs — none of that.
+    </div>
+  </div>
+
+  <div style="border-radius:8px;padding:12px 16px;background:#1a1200;border:1px solid #854F0B;margin-bottom:8px">
+    <div style="font-size:13px;font-weight:600;color:#EF9F27;margin-bottom:6px">LangGraph <span style="font-size:10px;font-weight:600;background:#854F0B;color:#FAEEDA;border-radius:4px;padding:2px 8px;margin-left:6px">loop + nodes + edges</span></div>
+    <div style="font-size:12px;color:#FAC775;line-height:1.8">
+      Owns: <strong>nodes</strong> — named Python functions registered as steps<br>
+      Owns: <strong>edges</strong> — routing rules between nodes ("if tool_calls → tools node, else → END")<br>
+      Owns: <strong>state</strong> — the growing messages list passed between nodes<br>
+      Owns: the loop itself — run node &#8594; check edge &#8594; run next node &#8594; repeat<br>
+      Uses LangChain message types (HumanMessage etc.) internally.
+    </div>
+  </div>
+
+  <div style="border-radius:8px;padding:12px 16px;background:#0d1520;border:1px solid #185FA5">
+    <div style="font-size:13px;font-weight:600;color:#85B7EB;margin-bottom:6px">LLM — qwen3.5:9b via Ollama <span style="font-size:10px;font-weight:600;background:#185FA5;color:#E6F1FB;border-radius:4px;padding:2px 8px;margin-left:6px">just reads + writes text</span></div>
+    <div style="font-size:12px;color:#B5D4F4;line-height:1.8">
+      Zero awareness of nodes, edges, or loops.<br>
+      Just receives a prompt (text) &#8594; returns a response (text or tool call JSON).<br>
+      It runs inside the model node. It has no idea it's in a graph.
+    </div>
+  </div>
+</div>
+
+<div class="phase-card">
+  <div class="phase-bar" style="background:#2C2C2A;color:#D3D1C7">A node is literally just a Python function — registered with LangGraph</div>
+<pre>
+<span class="hl-g"># model node — just a function</span>
+def <span class="hl-a">model_node</span>(state):
+    messages = state["messages"]          <span class="hl-g">&#8592; reads current state (LangChain messages)</span>
+    response = llm.invoke(messages)       <span class="hl-g">&#8592; calls the LLM (LangChain interface)</span>
+    return {"messages": [response]}       <span class="hl-g">&#8592; updates state with AIMessage</span>
+
+<span class="hl-g"># tools node — just a function</span>
+def <span class="hl-t">tools_node</span>(state):
+    tool_call = state["messages"][-1]     <span class="hl-g">&#8592; reads LLM's tool_call from state</span>
+    result = execute_tool(tool_call)      <span class="hl-g">&#8592; mcp-use fires call_tool on server.py</span>
+    return {"messages": [result]}         <span class="hl-g">&#8592; updates state with ToolMessage</span>
+
+<span class="hl-g"># LangGraph wires them together with edges:</span>
+graph = StateGraph(MessagesState)
+graph.add_node(<span class="hl-a">"model"</span>, model_node)     <span class="hl-g">&#8592; register node 1</span>
+graph.add_node(<span class="hl-t">"tools"</span>, tools_node)     <span class="hl-g">&#8592; register node 2</span>
+
+graph.add_edge(START, <span class="hl-a">"model"</span>)
+graph.add_conditional_edges(              <span class="hl-g">&#8592; the routing rule (the edge)</span>
+    <span class="hl-a">"model"</span>,
+    lambda state: <span class="hl-t">"tools"</span> if state["messages"][-1].tool_calls else END
+)
+graph.add_edge(<span class="hl-t">"tools"</span>, <span class="hl-a">"model"</span>)       <span class="hl-g">&#8592; always back to model</span>
+
+<span class="hl-g"># mcp-use builds this entire graph for you automatically.
+# You just call agent.run() and it runs the whole thing.</span></pre>
+</div>
+
+<div class="phase-card" style="border-color:#AFA9EC">
+  <div class="phase-bar" style="background:#3C3489;color:#CECBF6">Mapped to your real trace — now makes complete sense</div>
+<pre>
+<span class="hl-g">FROM YOUR LOG:</span>
+
+[chain:<span class="hl-a">LangGraph</span>] Entering Chain run           <span class="hl-g">&#8592; LangGraph loop starts</span>
+  &#9474;
+  &#9500;&#9472; [chain:LangGraph &gt; chain:<span class="hl-p">ModelCallLimitMiddleware.before_model</span>]
+  &#9474;     <span class="hl-g">&#8592; middleware node: checks step count before model runs</span>
+  &#9474;
+  &#9500;&#9472; [chain:LangGraph &gt; chain:<span class="hl-a">model</span>]            <span class="hl-g">&#8592; MODEL NODE runs</span>
+  &#9474;     [llm:<span class="hl-b">ChatOllama</span>] &#8594; qwen3.5:9b thinks
+  &#9474;     output: tool_calls=[get_weather(city=Tokyo)]
+  &#9474;     <span class="hl-g">edge: tool_calls not empty &#8594; route to TOOLS NODE</span>
+  &#9474;
+  &#9500;&#9472; [chain:LangGraph &gt; chain:<span class="hl-p">ModelCallLimitMiddleware.after_model</span>]
+  &#9474;     <span class="hl-g">&#8592; middleware node: records step_count = 1</span>
+  &#9474;
+  &#9500;&#9472; [chain:LangGraph &gt; chain:<span class="hl-t">tools</span>]             <span class="hl-g">&#8592; TOOLS NODE runs</span>
+  &#9474;     [tool:<span class="hl-t">get_weather</span>] &#8594; mcp-use &#8594; server.py &#8594; weather API
+  &#9474;     output: ToolMessage "17&#176;C, patchy rain..."
+  &#9474;     <span class="hl-g">edge: always &#8594; route back to MODEL NODE</span>
+  &#9474;
+  &#9500;&#9472; [chain:LangGraph &gt; chain:<span class="hl-a">model</span>]            <span class="hl-g">&#8592; MODEL NODE runs again</span>
+  &#9474;     [llm:<span class="hl-b">ChatOllama</span>] &#8594; reads tool result, writes answer
+  &#9474;     output: text="The weather in Tokyo...", tool_calls=[]
+  &#9474;     <span class="hl-g">edge: tool_calls=[] &#8594; route to END</span>
+  &#9474;
+  &#9492;&#9472; [chain:<span class="hl-a">LangGraph</span>] Exiting Chain run        <span class="hl-g">&#8592; graph done</span>
+
+<span class="hl-g">ModelCallLimitMiddleware.before/after_model = extra middleware nodes
+mcp-use adds these automatically to enforce max_steps=15.</span></pre>
+</div>
+
+<div class="phase-card">
+  <div class="phase-bar" style="background:#2C2C2A;color:#D3D1C7">Why nodes instead of a plain while loop?</div>
+<pre>
+<span class="hl-g">You COULD write the loop yourself (and it works):</span>
+while True:
+    response = llm.invoke(messages)
+    if response.tool_calls:
+        result = execute_tool(response.tool_calls[0])
+        messages.append(result)
+    else:
+        break
+
+<span class="hl-g">But LangGraph nodes give you things a plain loop cannot:</span>
+
+  <span class="hl-t">Visibility:</span>    every node logs input/output  &#8592; you saw this in your trace
+  <span class="hl-t">Middleware:</span>    inject logic between nodes     &#8592; how max_steps counter works
+  <span class="hl-t">Branching:</span>    route to different nodes       &#8592; error node, retry node etc.
+  <span class="hl-t">Checkpoints:</span>  pause and resume at any node   &#8592; your Week 4 human-in-loop gate!
+  <span class="hl-t">Parallelism:</span>  run multiple nodes at once     &#8592; multi-agent setups</pre>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+  <div class="phase-card" style="text-align:center;margin-bottom:0">
+    <div style="font-size:14px;font-weight:600;color:#9F9BE8;margin-bottom:8px">LangChain</div>
+    <div style="font-size:12px;color:#888780;line-height:1.6">The common language. HumanMessage, ToolMessage, StructuredTool, ChatOllama — all LangChain types.</div>
+  </div>
+  <div class="phase-card" style="text-align:center;margin-bottom:0">
+    <div style="font-size:14px;font-weight:600;color:#EF9F27;margin-bottom:8px">LangGraph</div>
+    <div style="font-size:12px;color:#888780;line-height:1.6">The loop engine. model node &#8594; tools node &#8594; model node, with state, edges, and step counting. Built on LangChain.</div>
+  </div>
+  <div class="phase-card" style="text-align:center;margin-bottom:0">
+    <div style="font-size:14px;font-weight:600;color:#85B7EB;margin-bottom:8px">Ollama / LLM</div>
+    <div style="font-size:12px;color:#888780;line-height:1.6">Just the brain. Reads prompt, writes response. No awareness of nodes, graphs, or loops.</div>
+  </div>
 </div>
 
 </body>
