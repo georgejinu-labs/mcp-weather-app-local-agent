@@ -2,10 +2,11 @@
 
 Sample project: a **FastMCP** weather server (tools backed by [wttr.in](https://wttr.in)), a **stdio** MCP subprocess, and a **LangChain** agent via **mcp-use** with **Ollama** (`langchain-ollama`).
 
-**Rendered HTML (diagrams, styling):** On GitHub, `.html` files in the file tree open as **source code**, not as a web page. Use one of these:
+**Rendered HTML (diagrams, styling):** The long-form doc is published at **[https://georgejinu-labs.github.io/mcp-weather-app-local-agent/](https://georgejinu-labs.github.io/mcp-weather-app-local-agent/)** — built from [`docs/index.html`](docs/index.html). On GitHub’s file browser, `docs/index.html` opens as **raw source**; use the Pages URL above for a normal web page.
 
-1. **GitHub Pages (recommended for reading in the browser)** — In the repo: **Settings → Pages → Build and deployment → Source:** “Deploy from a branch”, **Branch:** `main`, **Folder:** `/docs`, Save. After a minute, open **`https://georgejinu-labs.github.io/mcp-weather-app-local-agent/`** (replace owner/repo if yours differ). The source file is [`docs/index.html`](docs/index.html); edit that file when you want to change the rendered doc.
-2. **Local file** — After cloning, open [`docs/index.html`](docs/index.html) from disk in a browser (double-click or drag the file into a window).
+- **First-time setup:** **Settings → Pages →** Source: branch `main`, folder **`/docs`**, Save (wait ~1 minute for the site to update after pushes).
+- **Edit the doc:** change [`docs/index.html`](docs/index.html) in the repo, commit, push.
+- **Offline:** open `docs/index.html` from a local clone in your browser (double-click or drag into a window).
 
 ---
 
@@ -37,7 +38,7 @@ These are the pieces you see wired together in a trace such as `execution.log` (
 
 The log sequence is: **connect MCP → discover tools → build agent → for each user message, run the graph** (model ↔ tools ↔ MCP until the model answers without tools).
 
-**Viewing diagrams:** Fenced blocks marked `mermaid` render as graphics on **github.com** (and in editors with a Mermaid preview). In plain Markdown previews they often look like an unreadable code block — use the **ASCII** diagrams in that case, open [docs/index.html](docs/index.html) locally if it includes rendered diagrams, or paste the Mermaid source into [mermaid.live](https://mermaid.live).
+**Viewing diagrams:** Fenced blocks marked `mermaid` render as graphics on **github.com** (and in editors with a Mermaid preview). In plain Markdown previews they often look like an unreadable code block — use the **ASCII** diagrams in that case, see the [rendered HTML doc](https://georgejinu-labs.github.io/mcp-weather-app-local-agent/), open [docs/index.html](docs/index.html) locally, or paste the Mermaid source into [mermaid.live](https://mermaid.live).
 
 ### High-level ASCII
 
