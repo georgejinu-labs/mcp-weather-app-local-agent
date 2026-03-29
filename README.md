@@ -2,7 +2,10 @@
 
 Sample project: a **FastMCP** weather server (tools backed by [wttr.in](https://wttr.in)), a **stdio** MCP subprocess, and a **LangChain** agent via **mcp-use** with **Ollama** (`langchain-ollama`).
 
-**HTML version:** [README.html](./README.html) is a standalone export of this documentation. Use it when your Markdown preview does not render Mermaid or you want a single file to open in a browser. After cloning, open that file from disk (double-click or drag into a browser). On GitHub, browse to [README.html](./README.html) in the file tree (the web UI may show source or preview depending on the page).
+**Rendered HTML (diagrams, styling):** On GitHub, `.html` files in the file tree open as **source code**, not as a web page. Use one of these:
+
+1. **GitHub Pages (recommended for reading in the browser)** — In the repo: **Settings → Pages → Build and deployment → Source:** “Deploy from a branch”, **Branch:** `main`, **Folder:** `/docs`, Save. After a minute, open **`https://georgejinu-labs.github.io/mcp-weather-app-local-agent/`** (replace owner/repo if yours differ). The source file is [`docs/index.html`](docs/index.html); edit that file when you want to change the rendered doc.
+2. **Local file** — After cloning, open [`docs/index.html`](docs/index.html) from disk in a browser (double-click or drag the file into a window).
 
 ---
 
@@ -34,7 +37,7 @@ These are the pieces you see wired together in a trace such as `execution.log` (
 
 The log sequence is: **connect MCP → discover tools → build agent → for each user message, run the graph** (model ↔ tools ↔ MCP until the model answers without tools).
 
-**Viewing diagrams:** Fenced blocks marked `mermaid` render as graphics on **github.com** (and in editors with a Mermaid preview). In plain Markdown previews they often look like an unreadable code block — use the **ASCII** diagrams in that case, open [README.html](./README.html)
+**Viewing diagrams:** Fenced blocks marked `mermaid` render as graphics on **github.com** (and in editors with a Mermaid preview). In plain Markdown previews they often look like an unreadable code block — use the **ASCII** diagrams in that case, open [docs/index.html](docs/index.html) locally if it includes rendered diagrams, or paste the Mermaid source into [mermaid.live](https://mermaid.live).
 
 ### High-level ASCII
 
